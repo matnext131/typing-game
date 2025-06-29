@@ -4,6 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const incorrectSound = document.getElementById('incorrect-sound');
 
     // Screen elements
+    const passwordScreen = document.getElementById('password-screen'); // 追加
+    const passwordInput = document.getElementById('password-input');   // 追加
+    const passwordSubmit = document.getElementById('password-submit'); // 追加
+    const passwordMessage = document.getElementById('password-message'); // 追加
+    const mainContent = document.getElementById('main-content');     // 追加
+
     const selectionScreen = document.getElementById('selection-screen');
     const gameScreen = document.getElementById('game-screen');
     const topicList = document.getElementById('topic-list');
@@ -23,6 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let time = 60;
     let timerInterval;
     let totalTypedChars = 0;
+
+    // --- Password Configuration --- // 追加
+    const CORRECT_PASSWORD = "shakai131"; // ここに設定したいパスワードを入力してください
+
+    // --- Password Check Function --- // 追加
+    function checkPassword() {
+        if (passwordInput.value === CORRECT_PASSWORD) {
+            passwordScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+            loadTopics(); // パスワードが正しければトピックをロード
+        } else {
+            passwordMessage.textContent = 'パスワードが間違っています。';
+            passwordMessage.classList.remove('hidden');
+        }
+    }
 
     // --- Topic Data (Embedded to avoid fetch issues) ---
     const topics = {
@@ -167,7 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(setNextQuestion, 100);
         } else if (answer.startsWith(inputText)) {
             questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
-        } else {
+        }
+        else {
             
             questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
         }
@@ -191,6 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners ---
+    passwordSubmit.addEventListener('click', checkPassword); // 追加
+    passwordInput.addEventListener('keypress', (e) => { // 追加
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+
     startButton.addEventListener('click', startGame);
     inputElement.addEventListener('input', checkInput);
     backButton.addEventListener('click', goBackToSelection);
@@ -201,5 +230,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Initial Load ---
-    loadTopics();
+    // loadTopics(); // パスワードチェック後に呼び出すためコメントアウト
 });
