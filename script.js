@@ -22,14 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start-button');
     const backButton = document.getElementById('back-to-selection');
 
+    // New mode selection elements
+    const modeSelectionDiv = document.getElementById('mode-selection');
+    const easyModeButton = document.getElementById('easy-mode-button');
+    const hardModeButton = document.getElementById('hard-mode-button');
+
     // Game state variables
     let questions = [];
+    let originalQuestions = []; // 順番通りモード用に元の問題を保持
     let currentQuestionIndex = 0;
     let score = 0;
     let time = 60;
     let timerInterval;
     let totalTypedChars = 0;
-    let currentMode = null; // 現在選択されているモードを保持する変数
+    let currentMode = null;
+    let selectedTopicText = ''; // 選択されたトピックの問題文を保持
 
     // --- Password Configuration ---
     const CORRECT_PASSWORD = "shakai131"; // ここに設定したいパスワードを入力してください
@@ -39,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (passwordInput.value === CORRECT_PASSWORD) {
             passwordScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
-            loadTopics(); // パスワードが正しければトピックをロード
+            loadTopics();
         } else {
             passwordMessage.textContent = 'パスワードが間違っています。';
             passwordMessage.classList.remove('hidden');
@@ -49,69 +56,64 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Topic Data (Embedded to avoid fetch issues) ---
     const topics = {
         '社会科モード': {
-            '第１編世界と日本の姿': `\\nアジア州(あじあしゅう)\\nアフリカ州(あふりかしゅう)\\nアフリカ大陸(あふりかたいりく)\\n緯線(いせん)\\n緯度(いど)\\nインド洋(いんどよう)\\n択捉島(えとろふとう)\\nオーストラリア大陸(おーすとらりあたいりく)\\n沖ノ鳥島(おきのとりしま)\\nオセアニア州(おせあにあしゅう)\\n海洋(かいよう)\\n北アメリカ州(きたあめりかしゅう)\\n北アメリカ大陸(きたあめりかたいりく)\\n北回帰線(きたかいきせん)\\n北半球(きたはんきゅう)\\n旧グリニッジ天文台(きゅうぐりにっじてんもんだい)\\n極夜(きょくや)\\n経線(けいせん)\\n経度(けいど)\\n県庁所在地(けんちょうしょざ)\\n公海(こうかい)\\n国境(こっきょう)\\n三大洋(さんたいよう)\\n時差(じさ)\\n州(しゅう)\\n人口密度(じんこうみつど)\\n正距方位図法(せいきょほういずほう)\\n世界地図(せかいちず)\\n赤道(せきどう)\\n接続水域(せつぞくすいいき)\\n尖閣諸島(せんかくしょ)\\n大西洋(たいせいよう)\\n対せき点(たいせきてん)\\n太平洋(たいへいよう)\\n大陸(たいりく)\\n竹島(たけしま)\\n地球儀(ちきゅうぎ)\\n中華人民共和国(ちゅうかじんみんきょうわこく)\\n都道府県(とどうふけん)\\n内陸国(ないりくこく)\\n南極大陸(なんきょくたいりく)\\n日本列島(にほんれっとう)\\n排他的経済水域(はいたてきけいざいすいいき)\\nバチカン市国(ばちかんしこく)\\n白夜(びゃくや)\\n標準時(ひょうじゅんじ)\\n標準時子午線(ひょうじゅんじしごせん)\\n北方領土(ほっぽうりょうど)\\n本初子午線(ほんしょしごせん)\\n南アメリカ州(みなみあめりかしゅう)\\n南アメリカ大陸(みなみあめりかたいりく)\\n南回帰線(みなみかいきせん)\\n南鳥島(みなみとりしま)\\n南半球(みなみはんきゅう)\\nメルカトル図法(めるかとるずほう)\\nモルワイデ図法(もるわいで図法)\\nユーラシア大陸(ゆーらしあたいりく)\\nヨーロッパ州(よーろっぱしゅう)\\n与那国島(よなぐにじま)\\n陸地(りくち)\\n領域(りょういき)\\n領海(りょうかい)
-\\n領空(りょうくう)\\n領土(りょうど)\\n六大陸(ろくたいりく)\\nロシア連邦(ろしあれんぽう)`,
+            '第１編世界と日本の姿': `緯度(いど)\n経度(けいど)\n標準時子午線(ひょうじゅんじしごせん)\n兵庫県明石市(ひょうごけんあかしし)\n日付変更線(ひづけへんこうせん)\n排他的経済水域(はいたてきけいざいすいいき)\n北方領土(ほっぽうりょうど)\n竹島(たけしま)\n尖閣諸島(せんかくしょとう)\n領土(りょうど)\n領空(りょうくう)\n領海(りょうかい)\n都道府県(とどうふけん)\n県庁所在地(けんちょうしょざいち)\n地方区分(ちほうくぶん)\n六大陸(ろくたいりく)\n三大洋(さんたいよう)\n気候帯(きこうたい)\n熱帯(ねったい)\n乾燥帯(かんそうたい)\n温帯(おんたい)\n冷帯（亜寒帯）(れいたい（あかんたい）)\n寒帯(かんたい)`,
             '日本の地理': `北海道(ほっかいどう)\n本州(ほんしゅう)\n四国(しこく)\n九州(きゅうしゅう)\n沖縄(おきなわ)\n富士山(ふじさん)\n琵琶湖(びわこ)\n利根川(とねがわ)\n石狩平野(いしかりへいや)\n関東平野(かんとうへいや)`,
-            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`\\n寒帯(かんたい)\\nカリブー(かりぶー)\\nイヌイット(いぬいっと)\\nイグルー(いぐるー)\\n亜寒帯(あかんたい)\\n針葉樹(しんようじゅ)\\nタイガ(たいが)\\n広葉樹(こうようじゅ)\\nダーチャ(だーちゃ)\\n温帯(おんたい)\\n地中海性気候(ちちゅうかいせいきこう)\\n温暖湿潤気候(おんだんしつじゅんきこう)\\n西岸海洋性気候(せいがんかいようせいきこう)\\n乾燥帯(かんそうたい)\\nオアシス(おあしす)\\nサヘル(さへる)\\n遊牧(ゆうぼく)\\n砂漠化(さばくか)\\n焼畑農業(やきはたのうぎょう)\\n熱帯(ねったい)\\n熱帯雨林(ねったいうりん)\\nマングローブ(まんぐろーぶ)\\nさんご礁(さんごしょう)\\n持続可能な開発(じぞくかのうなかいはつ)\\n標高(ひょうこう)\\n放牧(ほうぼく)\\n高山気候(こうざんきこう)\\nリャマ(りゃま)\\nアルパカ(あるぱか)\\nポンチョ(ぽんちょ)\\nマチュピチュ(まちゅぴちゅ)\\n気候帯(きこうたい)\\n気候区(きこうく)\\n氷雪気候(ひょうせつきこう)\\nツンドラ気候(つんどらきこう)\\n砂漠気候(さばくきこう)\\nステップ気候(すてっぷきこう)\\n熱帯雨林気候(ねったいうりんきこう)\\nサバナ気候(さばなきこう)\\n仏教(ぶっきょう)\\n大乗仏教(だいじょうぶっきょう)\\n上座部仏教(じょうざぶぶっきょう)\\nキリスト教(きりすときょう)\\nイスラーム(いすらーむ)\\nハラル(はらる)\\nヒンドゥー教(ひんどぅーきょう)\\nユダヤ教(ゆだやきょう)\\nムスリム(むすりむ) `,
+            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境': ``
         }
     };
 
     // --- Topic Loading ---
     function loadTopics() {
-        topicList.innerHTML = ''; // Clear existing topics
-        messageElement.textContent = 'モードを選択してください。'; // メッセージ変更
+        topicList.innerHTML = '';
+        messageElement.textContent = 'モードを選択してください。';
 
-        // モード選択画面
         if (currentMode === null) {
             Object.keys(topics).forEach(modeName => {
                 const button = document.createElement('a');
                 button.className = 'list-group-item list-group-item-action topic-button';
                 button.textContent = modeName;
-                button.onclick = () => selectMode(modeName); // selectMode関数を呼び出す
+                button.onclick = () => selectMode(modeName);
                 topicList.appendChild(button);
             });
-        } else { // トピック選択画面
+        } else {
             Object.keys(topics[currentMode]).forEach(topicName => {
                 const button = document.createElement('a');
                 button.className = 'list-group-item list-group-item-action topic-button';
                 button.textContent = topicName;
-                button.onclick = () => selectTopic(topicName); // selectTopic関数を呼び出す
+                button.onclick = () => selectTopic(topicName);
                 topicList.appendChild(button);
             });
-            // トピック選択画面では「モード選択に戻る」ボタンを表示
             const backToModeButton = document.createElement('button');
             backToModeButton.className = 'btn btn-secondary btn-block mt-3';
             backToModeButton.textContent = 'モード選択に戻る';
             backToModeButton.onclick = () => {
-                currentMode = null; // モードをリセット
-                loadTopics(); // モード選択画面に戻る
+                currentMode = null;
+                loadTopics();
             };
             topicList.appendChild(backToModeButton);
         }
     }
 
-    // 新しい関数：モード選択
     function selectMode(modeName) {
         currentMode = modeName;
-        loadTopics(); // 選択されたモードのトピックをロード
+        loadTopics();
     }
 
-    // 既存のselectTopic関数を修正
     function selectTopic(topicName) {
-        // --- Audio Unlock Workaround ---
         correctSound.play();
         correctSound.pause();
         incorrectSound.play();
         incorrectSound.pause();
-        // --------------------------------
 
-        // 選択されたモード内のトピックを取得
-        const text = topics[currentMode][topicName];
-        if (text) {
-            parseQuestions(text);
+        selectedTopicText = topics[currentMode][topicName]; // 選択されたトピックの問題文を保存
+
+        if (selectedTopicText) {
             selectionScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
+            modeSelectionDiv.classList.remove('hidden'); // モード選択ボタンを表示
+            startButton.classList.add('hidden'); // ゲーム開始ボタンを隠す
             resetGame();
+            questionElement.textContent = 'モードを選択してください'; // モード選択を促すメッセージ
         } else {
             console.error('Selected topic not found:', topicName);
             alert('選択されたトピックが見つかりませんでした。');
@@ -119,13 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function parseQuestions(text) {
-        questions = text.split('\n').map(line => {
+        originalQuestions = text.split('\n').map(line => {
             const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
             if (match) {
                 return { display: match[1].trim(), answer: match[2].trim() };
             }
             return null;
         }).filter(q => q && q.display && q.answer);
+        questions = [...originalQuestions]; // 初期状態は順番通り
     }
 
     // --- Game Logic ---
@@ -144,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreElement.textContent = score;
         timerElement.textContent = time;
         wpmElement.textContent = 0;
-        questionElement.textContent = '準備完了';
+        // questionElement.textContent = '準備完了'; // モード選択を促すためコメントアウト
     }
 
     function startGame() {
@@ -159,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageElement.textContent = 'タイピングを開始してください。';
         startButton.style.display = 'none';
         backButton.classList.add('hidden');
+        modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
         time = 60;
         score = 0;
         totalTypedChars = 0;
@@ -238,14 +242,38 @@ document.addEventListener('DOMContentLoaded', () => {
         startButton.textContent = 'もう一度プレイ';
         startButton.style.display = 'block';
         backButton.classList.remove('hidden');
+        modeSelectionDiv.classList.remove('hidden'); // モード選択ボタンを再表示
     }
 
     function goBackToSelection() {
         gameScreen.classList.add('hidden');
         selectionScreen.classList.remove('hidden');
-        currentMode = null; // モードをリセットして、モード選択画面に戻る
+        currentMode = null;
         loadTopics();
+        modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
     }
+
+    // --- Mode Selection Logic ---
+    easyModeButton.addEventListener('click', () => {
+        parseQuestions(selectedTopicText); // 元の問題順に戻す
+        startButton.classList.remove('hidden'); // ゲーム開始ボタンを表示
+        questionElement.textContent = '準備完了'; // 準備完了メッセージ
+        modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
+        resetGame();
+    });
+
+    hardModeButton.addEventListener('click', () => {
+        parseQuestions(selectedTopicText); // 元の問題をロード
+        // 問題をシャッフル
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+        startButton.classList.remove('hidden'); // ゲーム開始ボタンを表示
+        questionElement.textContent = '準備完了'; // 準備完了メッセージ
+        modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
+        resetGame();
+    });
 
     // --- Event Listeners ---
     passwordSubmit.addEventListener('click', checkPassword);
@@ -263,8 +291,4 @@ document.addEventListener('DOMContentLoaded', () => {
             inputElement.value = '';
         }, 0);
     });
-
-    // --- Initial Load ---
-    // DOMContentLoaded イベントリスナー内で、パスワードチェック後に loadTopics() を呼び出す部分は
-    // checkPassword 関数内で呼び出されるため、ここでは不要
 });
