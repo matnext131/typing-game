@@ -53,9 +53,133 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Topic Data (Embedded to avoid fetch issues) ---
     const topics = {
         '社会科モード': {
-            '第１編世界と日本の姿': `\nアジア州(あじあしゅう)\nアフリカ州(あふりかしゅう)\nアフリカ大陸(あふりかたいりく)\n緯線(いせん)\n緯度(いど)\nインド洋(いんどよう)\n択捉島(えとろふとう)\nオーストラリア大陸(おーすとらりあたいりく)\n沖ノ鳥島(おきのとりしま)\nオセアニア州(おせあにあしゅう)\n海洋(かいよう)\n北アメリカ州(きたあめりかしゅう)\n北アメリカ大陸(きたあめりかたいりく)\n北回帰線(きたかいきせん)\n北半球(きたはんきゅう)\n旧グリニッジ天文台(きゅうぐりにっじてんもんだい)\n極夜(きょくや)\n経線(けいせん)\n経度(けいど)\n県庁所在地(けんちょうしょざいち)\n公海(こうかい)\n国境(こっきょう)\n三大洋(さんたいよう)\n時差(じさ)\n州(しゅう)\n人口密度(じんこうみつど)\n正距方位図法(せいきょほういずほう)\n世界地図(せかいちず)\n赤道(せきどう)\n接続水域(せつぞくすいいき)\n尖閣諸島(せんかくしょ)\n大西洋(たいせいよう)\n対せき点(たいせきてん)\n太平洋(たいへいよう)\n大陸(たいりく)\n竹島(たけしま)\n地球儀(ちきゅうぎ)\n中華人民共和国(ちゅうかじんみんきょうわこく)\n都道府県(とどうふけん)\n内陸国(ないりくこく)\n南極大陸(なんきょくたいりく)\n日本列島(にほんれっとう)\n排他的経済水域(はいたてきけいざいすいいき)\nバチカン市国(ばちかんしこく)\n白夜(びゃくや)\n標準時(ひょうじゅんじ)\n標準時子午線(ひょうじゅんじしごせん)\n北方領土(ほっぽうりょうど)\n本初子午線(ほんしょしごせん)\n南アメリカ州(みなみあめりかしゅう)\n南アメリカ大陸(みなみあめりかたいりく)\n南回帰線(みなみかいきせん)\n南鳥島(みなみとりしま)\n南半球(みなみはんきゅう)\nメルカトル図法(めるかとるずほう)\nモルワイデ図法(もるわいで図法)\nユーラシア大陸(ゆーらしあたいりく)\nヨーロッパ州(よーろっぱしゅう)\n与那国島(よなぐにじま)\n陸地(りくち)\n領域(りょういき)\n領海(りょうかい)\n領空(りょうくう)\n領土(りょうど)\n六大陸(ろくたいりく)\nロシア連邦(ろしあれんぽう)`,
-            '日本の地理': `北海道(ほっかいどう)\n本州(ほんしゅう)\n四国(しこく)\n九州(きゅうしゅう)\n沖縄(おきなわ)\n富士山(ふじさん)\n琵琶湖(びわこ)\n利根川(とねがわ)\n石狩平野(いしかりへいや)\n関東平野(かんとうへいや)`,
-            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`\n寒帯(かんたい)\nカリブー(かりぶー)\nイヌイット(いぬいっと)\nイグルー(いぐるー)\n亜寒帯（冷帯）(あかんたい（れいたい）)\n針葉樹(しんようじゅ)\nタイガ(たいが)\n広葉樹(こうようじゅ)\nダーチャ(だーちゃ)\n温帯(おんたい)\n地中海性気候(ちちゅうかいせいきこう)\n温暖湿潤気候(おんだんしつじゅんきこう)\n西岸海洋性気候(せいがんかいようせいきこう)\n乾燥帯(かんそうたい)\nオアシス(おあしす)\nサヘル(さへる)\n遊牧(ゆうぼく)\n砂漠化(さばくか)\n焼畑農業(やきはたのうぎょう)\n砂漠化(さばくか)\n熱帯(ねったい)\n熱帯雨林(ねったいうりん)\nマングローブ(まんぐろーぶ)\nさんご礁(さんごしょう)\n持続可能な開発(じぞくかのうなかいはつ)\n標高(ひょうこう)\n放牧(ほうぼく)\n高山気候(こうざんきこう)\nリャマ(りゃま)\nアルパカ(あるぱか)\nポンチョ(ぽんちょ)\nマチュピチュ(まちゅぴちゅ)\n気候帯(きこうたい)\n気候区(きこうく)\n氷雪気候(ひょうせつきこう)\nツンドラ気候(つんどらきこう)\n砂漠気候(さばくきこう)\nステップ気候(すてっぷきこう)\n熱帯雨林気候(ねったいうりんきこう)\nサバナ気候(さばなきこう)\n仏教(ぶっきょう)\n大乗仏教(だいじょうぶっきょう)\n上座部仏教(じょうざぶぶっきょう)\nキリスト教(きりすときょう)\nイスラーム(いすらーむ)\nハラル(はらる)\nヒンドゥー教(ひんどぅーきょう)\nユダヤ教(ゆだやきょう)\nムスリム(むすりむ) `,
+            '第１編世界と日本の姿': `
+アジア州(あじあしゅう)
+アフリカ州(あふりかしゅう)
+アフリカ大陸(あふりかたいりく)
+緯線(いせん)
+緯度(いど)
+インド洋(いんどよう)
+択捉島(えとろふとう)
+オーストラリア大陸(おーすとらりあたいりく)
+沖ノ鳥島(おきのとりしま)
+オセアニア州(おせあにあしゅう)
+海洋(かいよう)
+北アメリカ州(きたあめりかしゅう)
+北アメリカ大陸(きたあめりかたいりく)
+北回帰線(きたかいきせん)
+北半球(きたはんきゅう)
+旧グリニッジ天文台(きゅうぐりにっじてんもんだい)
+極夜(きょくや)
+経線(けいせん)
+経度(けいど)
+県庁所在地(けんちょうしょざいち)
+公海(こうかい)
+国境(こっきょう)
+三大洋(さんたいよう)
+時差(じさ)
+州(しゅう)
+人口密度(じんこうみつど)
+正距方位図法(せいきょほういずほう)
+世界地図(せかいちず)
+赤道(せきどう)
+接続水域(せつぞくすいいき)
+尖閣諸島(せんかくしょ)
+大西洋(たいせいよう)
+対せき点(たいせきてん)
+太平洋(たいへいよう)
+大陸(たいりく)
+竹島(たけしま)
+地球儀(ちきゅうぎ)
+中華人民共和国(ちゅうかじんみんきょうわこく)
+都道府県(とどうふけん)
+内陸国(ないりくこく)
+南極大陸(なんきょくたいりく)
+日本列島(にほんれっとう)
+排他的経済水域(はいたてきけいざいすいいき)
+バチカン市国(ばちかんしこく)
+白夜(びゃくや)
+標準時(ひょうじゅんじ)
+標準時子午線(ひょうじゅんじしごせん)
+北方領土(ほっぽうりょうど)
+本初子午線(ほんしょしごせん)
+南アメリカ州(みなみあめりかしゅう)
+南アメリカ大陸(みなみあめりかたいりく)
+南回帰線(みなみかいきせん)
+南鳥島(みなみとりしま)
+南半球(みなみはんきゅう)
+メルカトル図法(めるかとるずほう)
+モルワイデ図法(もるわいで図法)
+ユーラシア大陸(ゆーらしあたいりく)
+ヨーロッパ州(よーろっぱしゅう)
+与那国島(よなぐにじま)
+陸地(りくち)
+領域(りょういき)
+領海(りょうかい)
+領空(りょうくう)
+領土(りょうど)
+六大陸(ろくたいりく)
+ロシア連邦(ろしあれんぽう)`,
+            '日本の地理': `北海道(ほっかいどう)
+本州(ほんしゅう)
+四国(しこく)
+九州(きゅうしゅう)
+沖縄(おきなわ)
+富士山(ふじさん)
+琵琶湖(びわこ)
+利根川(とねがわ)
+石狩平野(いしかりへいや)
+関東平野(かんとうへいや)`,
+            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`
+寒帯(かんたい)
+カリブー(かりぶー)
+イヌイット(いぬいっと)
+イグルー(いぐるー)
+亜寒帯（冷帯）(あかんたい（れいたい）)
+針葉樹(しんようじゅ)
+タイガ(たいが)
+広葉樹(こうようじゅ)
+ダーチャ(だーちゃ)
+温帯(おんたい)
+地中海性気候(ちちゅうかいせいきこう)
+温暖湿潤気候(おんだんしつじゅんきこう)
+西岸海洋性気候(せいがんかいようせいきこう)
+乾燥帯(かんそうたい)
+オアシス(おあしす)
+サヘル(さへる)
+遊牧(ゆうぼく)
+砂漠化(さばくか)
+焼畑農業(やきはたのうぎょう)
+砂漠化(さばくか)
+熱帯(ねったい)
+熱帯雨林(ねったいうりん)
+マングローブ(まんぐろーぶ)
+さんご礁(さんごしょう)
+持続可能な開発(じぞくかのうなかいはつ)
+標高(ひょうこう)
+放牧(ほうぼく)
+高山気候(こうざんきこう)
+リャマ(りゃま)
+アルパカ(あるぱか)
+ポンチョ(ぽんちょ)
+マチュピチュ(まちゅぴちゅ)
+気候帯(きこうたい)
+気候区(きこうく)
+氷雪気候(ひょうせつきこう)
+ツンドラ気候(つんどらきこう)
+砂漠気候(さばくきこう)
+ステップ気候(すてっぷきこう)
+熱帯雨林気候(ねったいうりんきこう)
+サバナ気候(さばなきこう)
+仏教(ぶっきょう)
+大乗仏教(だいじょうぶっきょう)
+上座部仏教(じょうざぶぶっきょう)
+キリスト教(きりすときょう)
+イスラーム(いすらーむ)
+ハラル(はらる)
+ヒンドゥー教(ひんどぅーきょう)
+ユダヤ教(ゆだやきょう)
+ムスリム(むすりむ) `,
         }
     };
 
@@ -231,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
          } else if (answer.startsWith(inputText)) {
              questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
          } else {
-             questionElement.innerHTML = `<span class=\"incorrect\">${currentQuestion.display}</span>`;
+             questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
          }
      }
 
@@ -255,52 +379,43 @@ document.addEventListener('DOMContentLoaded', () => {
          modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
      }
 
-     // --- Mode Selection Logic ---
-     easyModeButton.addEventListener('click', () => {
-         parseQuestions(selectedTopicText); // 元の問題順に戻す
-         startButton.classList.remove('hidden'); // ゲーム開始ボタンを表示
-         questionElement.textContent = '準備完了'; // 準備完了メッセージ
-         modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
-         resetGame();
-         startGame();
-     });
+    // --- Event Listeners ---
+    passwordSubmit.addEventListener('click', checkPassword);
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
 
-     hardModeButton.addEventListener('click', () => {
-         parseQuestions(selectedTopicText); // 元の問題をロード
-         // 問題をシャッフル
-         for (let i = questions.length - 1; i > 0; i--) {
-             const j = Math.floor(Math.random() * (i + 1));
-             [questions[i], questions[j]] = [questions[j], questions[i]];
-         }
-         startButton.classList.remove('hidden'); // ゲーム開始ボタンを表示
-         questionElement.textContent = '準備完了'; // 準備完了メッセージ
-         modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
-         resetGame();
-         startGame();
-     });
+    startButton.addEventListener('click', startGame);
+    inputElement.addEventListener('input', checkInput);
+    backButton.addEventListener('click', goBackToSelection);
+    inputElement.addEventListener('focus', () => {
+        setTimeout(() => {
+            inputElement.value = '';
+        }, 0);
+    });
 
-     // --- Event Listeners ---
-     passwordSubmit.addEventListener('click', checkPassword);
-     passwordInput.addEventListener('keypress', (e) => {
-         if (e.key === 'Enter') {
-             checkPassword();
-         }
-     });
+    easyModeButton.addEventListener('click', () => {
+        parseQuestions(selectedTopicText); // 元の問題順に戻す
+        startGame();
+    });
 
-     startButton.addEventListener('click', startGame);
-     inputElement.addEventListener('input', checkInput);
-     backButton.addEventListener('click', goBackToSelection);
-     inputElement.addEventListener('focus', () => {
-         setTimeout(() => {
-             inputElement.value = '';
-         }, 0);
-     });
- });
+    hardModeButton.addEventListener('click', () => {
+        parseQuestions(selectedTopicText); // 元の問題をロード
+        // 問題をシャッフル
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+        startGame();
+    });
+});
 
- // --- Helper Functions ---
- function shuffleArray(array) {
-     for (let i = array.length - 1; i > 0; i--) {
-         const j = Math.floor(Math.random() * (i + 1));
-         [array[i], array[j]] = [array[j], array[i]];
-     }
- }
+// --- Helper Functions ---
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
