@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageElement = document.getElementById('message');
     const startButton = document.getElementById('start-button');
     const backButton = document.getElementById('back-to-selection');
+    const modeSelectionDiv = document.getElementById('mode-selection');
+    const easyModeButton = document.getElementById('easy-mode-button');
+    const hardModeButton = document.getElementById('hard-mode-button');
 
     // Game state variables
     let questions = [];
@@ -30,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval;
     let totalTypedChars = 0;
     let currentMode = null; // 現在選択されているモードを保持する変数
+    let selectedTopicText = ''; // 選択されたトピックの原文を保持する変数
 
     // --- Password Configuration ---
     const CORRECT_PASSWORD = "shakai131"; // ここに設定したいパスワードを入力してください
@@ -107,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 選択されたモード内のトピックを取得
         const text = topics[currentMode][topicName];
         if (text) {
+            selectedTopicText = text; // Store the original text
             parseQuestions(text);
             selectionScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
@@ -143,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
          scoreElement.textContent = score;
          timerElement.textContent = time;
          wpmElement.textContent = 0;
-         // questionElement.textContent = '準備完了'; // モード選択を促すためコメントアウト
+         questionElement.textContent = '準備完了';
+         modeSelectionDiv.classList.remove('hidden');
      }
 
      function startGame() {
@@ -256,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
          questionElement.textContent = '準備完了'; // 準備完了メッセージ
          modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
          resetGame();
+         startGame();
      });
 
      hardModeButton.addEventListener('click', () => {
@@ -269,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
          questionElement.textContent = '準備完了'; // 準備完了メッセージ
          modeSelectionDiv.classList.add('hidden'); // モード選択ボタンを隠す
          resetGame();
+         startGame();
      });
 
      // --- Event Listeners ---
@@ -288,3 +296,11 @@ document.addEventListener('DOMContentLoaded', () => {
          }, 0);
      });
  });
+
+ // --- Helper Functions ---
+ function shuffleArray(array) {
+     for (let i = array.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [array[i], array[j]] = [array[j], array[i]];
+     }
+ }
