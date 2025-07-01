@@ -260,9 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
      function resetGame() {
          inputElement.disabled = true;
          inputElement.value = '';
-         messageElement.textContent = '「ゲーム開始」ボタンを押してスタート！';
+         messageElement.textContent = 'モードを選択してください';
          messageElement.className = 'alert alert-info mt-4';
-         startButton.style.display = 'block';
+         startButton.style.display = 'none';
          startButton.textContent = 'ゲーム開始';
          backButton.classList.add('hidden');
          score = 0;
@@ -365,8 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
          const finalWPM = wpmElement.textContent;
          messageElement.textContent = `ゲーム終了！スコア: ${score}, WPM: ${finalWPM}`;
          messageElement.className = 'alert alert-success mt-4';
-         startButton.textContent = 'もう一度プレイ';
-         startButton.style.display = 'block';
          backButton.classList.remove('hidden');
          modeSelectionDiv.classList.remove('hidden'); // モード選択ボタンを再表示
      }
