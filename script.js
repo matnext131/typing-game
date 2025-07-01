@@ -263,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
          messageElement.textContent = 'モードを選択してください';
          messageElement.className = 'alert alert-info mt-4';
          startButton.style.display = 'none';
-         startButton.textContent = 'ゲーム開始';
          backButton.classList.add('hidden');
          score = 0;
          time = 60;
@@ -385,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    startButton.addEventListener('click', startGame);
     inputElement.addEventListener('input', checkInput);
     backButton.addEventListener('click', goBackToSelection);
     inputElement.addEventListener('focus', () => {
