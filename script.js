@@ -10,23 +10,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordMessage = document.getElementById('password-message');
     const mainContent = document.getElementById('main-content');
 
-    const selectionScreen = document.getElementById('selection-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const topicList = document.getElementById('topic-list');
-    const questionElement = document.getElementById('question');
-    const inputElement = document.getElementById('input');
-    const timerElement = document.getElementById('timer');
-    const scoreElement = document.getElementById('score');
-    const wpmElement = document.getElementById('wpm');
-    const consecutiveCorrectElement = document.getElementById('consecutive-correct');
-    const messageElement = document.getElementById('message');
-    const startButton = document.getElementById('start-button');
-    const backButton = document.getElementById('back-to-selection');
-    const modeSelectionDiv = document.getElementById('mode-selection');
-    const easyModeButton = document.getElementById('easy-mode-button');
-    const hardModeButton = document.getElementById('hard-mode-button');
-    const wpmContainer = document.getElementById('wpm-container');
-    const consecutiveContainer = document.getElementById('consecutive-container');
+    // Game state variables
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let time = 60;
+    let timerInterval;
+    let totalTypedChars = 0;
+    let consecutiveCorrect = 0;
+    let currentMode = null;
+    let currentQuizCategory = null;
+    let selectedTopicText = '';
+
+    const CORRECT_PASSWORD = "shakai131";
+
+    function getGameElements() {
+        return {
+            selectionScreen: document.getElementById('selection-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            topicList: document.getElementById('topic-list'),
+            questionElement: document.getElementById('question'),
+            inputElement: document.getElementById('input'),
+            timerElement: document.getElementById('timer'),
+            scoreElement: document.getElementById('score'),
+            wpmElement: document.getElementById('wpm'),
+            consecutiveCorrectElement: document.getElementById('consecutive-correct'),
+            messageElement: document.getElementById('message'),
+            startButton: document.getElementById('start-button'),
+            backButton: document.getElementById('back-to-selection'),
+            modeSelectionDiv: document.getElementById('mode-selection'),
+            easyModeButton: document.getElementById('easy-mode-button'),
+            hardModeButton: document.getElementById('hard-mode-button'),
+            wpmContainer: document.getElementById('wpm-container'),
+            consecutiveContainer: document.getElementById('consecutive-container')
+        };
+    }
 
     // Game state variables
     let questions = [];
@@ -418,6 +436,7 @@ EU(いーゆー)
 
     function selectTopic(topicName) {
         console.log(`トピック選択: ${topicName}`);
+        const { selectionScreen, gameScreen } = getGameElements();
         correctSound.play().catch(e => {});
         correctSound.pause();
         incorrectSound.play().catch(e => {});
@@ -433,8 +452,8 @@ EU(いーゆー)
         if (text) {
             selectedTopicText = text;
             parseQuestions(text);
-            selectionScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
+            if (selectionScreen) selectionScreen.classList.add('hidden');
+            if (gameScreen) gameScreen.classList.remove('hidden');
             resetGame();
         } else {
             console.error('Selected topic not found:', topicName);
@@ -457,41 +476,89 @@ EU(いーゆー)
 
     function resetGame() {
         console.log("resetGame function entered");
-        inputElement.disabled = true;
-        inputElement.value = '';
-        messageElement.className = 'alert alert-info mt-4';
-        backButton.classList.add('hidden');
+        const { inputElement, messageElement, backButton, scoreElement, timerElement, wpmElement, consecutiveCorrectElement, questionElement, modeSelectionDiv, wpmContainer, consecutiveContainer, easyModeButton, hardModeButton, startButton } = getGameElements();
+
+        if (inputElement) inputElement.disabled = true;
+        if (inputElement) inputElement.value = '';
+        if (messageElement) messageElement.className = 'alert alert-info mt-4';
+        if (backButton) backButton.classList.add('hidden');
         score = 0;
         time = 60;
         totalTypedChars = 0;
         consecutiveCorrect = 0;
-        scoreElement.textContent = score;
-        timerElement.textContent = time;
-        wpmElement.textContent = 0;
-        consecutiveCorrectElement.textContent = 0;
-        questionElement.textContent = '準備完了';
-        modeSelectionDiv.classList.remove('hidden');
+        if (scoreElement) scoreElement.textContent = score;
+        if (timerElement) timerElement.textContent = time;
+        if (wpmElement) wpmElement.textContent = 0;
+        if (consecutiveCorrectElement) consecutiveCorrectElement.textContent = 0;
+        if (questionElement) questionElement.textContent = '準備完了';
+        if (modeSelectionDiv) modeSelectionDiv.classList.remove('hidden');
 
         if (currentMode === 'タイピングモード') {
-            wpmContainer.style.display = 'block';
-            consecutiveContainer.style.display = 'none';
-            easyModeButton.style.display = 'inline-block';
-            hardModeButton.style.display = 'inline-block';
-            startButton.style.display = 'none';
-            messageElement.textContent = '難易度を選択してください';
+            if (wpmContainer) wpmContainer.style.display = 'block';
+            if (consecutiveContainer) consecutiveContainer.style.display = 'none';
+            if (easyModeButton) easyModeButton.style.display = 'inline-block';
+            if (hardModeButton) hardModeButton.style.display = 'inline-block';
+            if (startButton) startButton.style.display = 'none';
+            if (messageElement) messageElement.textContent = '難易度を選択してください';
         } else if (currentMode === 'クイズモード') {
-            wpmContainer.style.display = 'none';
-            consecutiveContainer.style.display = 'block';
-            easyModeButton.style.display = 'inline-block';
-            hardModeButton.style.display = 'inline-block';
-            startButton.style.display = 'none';
-            messageElement.textContent = '難易度を選択してください';
+            if (wpmContainer) wpmContainer.style.display = 'none';
+            if (consecutiveContainer) consecutiveContainer.style.display = 'block';
+            if (easyModeButton) easyModeButton.style.display = 'inline-block';
+            if (hardModeButton) hardModeButton.style.display = 'inline-block';
+            if (startButton) startButton.style.display = 'none';
+            if (messageElement) messageElement.textContent = '難易度を選択してください';
         }
         console.log("ゲームのリセット完了");
+        attachGameEventListeners(); // Attach listeners here
+    }
+
+    function attachGameEventListeners() {
+        const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
+
+        if (inputElement) {
+            inputElement.oninput = null; // Clear previous listener
+            inputElement.onkeypress = null; // Clear previous listener
+            inputElement.addEventListener('input', () => {
+                if (currentMode === 'タイピングモード') {
+                    checkTypingInput();
+                }
+            });
+            inputElement.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && currentMode === 'クイズモード') {
+                    checkQuizInput();
+                }
+            });
+        }
+
+        if (backButton) {
+            backButton.onclick = null; // Clear previous listener
+            backButton.addEventListener('click', goBackToSelection);
+        }
+
+        if (easyModeButton) {
+            easyModeButton.onclick = null; // Clear previous listener
+            easyModeButton.addEventListener('click', () => {
+                startGame(false);
+            });
+        }
+
+        if (hardModeButton) {
+            hardModeButton.onclick = null; // Clear previous listener
+            hardModeButton.addEventListener('click', () => {
+                startGame(true);
+            });
+        }
+        
+        if (startButton) {
+            startButton.onclick = null; // Clear previous listener
+            startButton.addEventListener('click', () => startGame(false));
+        }
     }
 
     function startGame(isHardMode = false) {
         console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
+        const { inputElement, messageElement, startButton, backButton, modeSelectionDiv, scoreElement, timerElement, wpmElement, consecutiveCorrectElement } = getGameElements();
+
         if (questions.length === 0) {
             alert('問題がありません。');
             console.error("startGameが呼び出されましたが、問題がありませんでした。");
@@ -506,21 +573,23 @@ EU(いーゆー)
             }
         }
 
-        inputElement.disabled = false;
-        inputElement.value = '';
-        inputElement.focus();
-        messageElement.textContent = 'がんばれ！';
-        startButton.style.display = 'none';
-        backButton.classList.add('hidden');
-        modeSelectionDiv.classList.add('hidden');
+        if (inputElement) {
+            inputElement.disabled = false;
+            inputElement.value = '';
+            inputElement.focus();
+        }
+        if (messageElement) messageElement.textContent = 'がんばれ！';
+        if (startButton) startButton.style.display = 'none';
+        if (backButton) backButton.classList.add('hidden');
+        if (modeSelectionDiv) modeSelectionDiv.classList.add('hidden');
         time = 60;
         score = 0;
         totalTypedChars = 0;
         consecutiveCorrect = 0;
-        scoreElement.textContent = score;
-        timerElement.textContent = time;
-        wpmElement.textContent = 0;
-        consecutiveCorrectElement.textContent = 0;
+        if (scoreElement) scoreElement.textContent = score;
+        if (timerElement) timerElement.textContent = time;
+        if (wpmElement) wpmElement.textContent = 0;
+        if (consecutiveCorrectElement) consecutiveCorrectElement.textContent = 0;
         
         console.log("次の問題を設定します");
         setNextQuestion();
@@ -530,19 +599,21 @@ EU(いーゆー)
     }
 
     function setNextQuestion() {
+        const { questionElement, inputElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) {
             endGame();
             return;
         }
-        questionElement.textContent = questions[currentQuestionIndex].display;
-        inputElement.value = '';
+        if (questionElement) questionElement.textContent = questions[currentQuestionIndex].display;
+        if (inputElement) inputElement.value = '';
     }
 
     function startTimer() {
+        const { timerElement } = getGameElements();
         stopTimer();
         timerInterval = setInterval(() => {
             time--;
-            timerElement.textContent = time;
+            if (timerElement) timerElement.textContent = time;
             if (currentMode === 'タイピングモード') {
                 calculateWPM();
             }
@@ -557,19 +628,21 @@ EU(いーゆー)
     }
 
     function calculateWPM() {
+        const { wpmElement } = getGameElements();
         const elapsedTime = 60 - time;
         if (elapsedTime === 0) {
-            wpmElement.textContent = 0;
+            if (wpmElement) wpmElement.textContent = 0;
             return;
         }
         const wpm = Math.round((totalTypedChars / 5) / (elapsedTime / 60));
-        wpmElement.textContent = wpm;
+        if (wpmElement) wpmElement.textContent = wpm;
     }
 
     function checkTypingInput() {
+        const { inputElement, scoreElement, questionElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) return;
         const currentQuestion = questions[currentQuestionIndex];
-        const inputText = inputElement.value;
+        const inputText = inputElement ? inputElement.value : '';
         const answer = currentQuestion.answer;
 
         if (inputText === answer) {
@@ -577,65 +650,70 @@ EU(いーゆー)
             correctSound.play().catch(e => {});
             score++;
             totalTypedChars += answer.length;
-            scoreElement.textContent = score;
+            if (scoreElement) scoreElement.textContent = score;
             currentQuestionIndex++;
-            inputElement.value = '';
+            if (inputElement) inputElement.value = '';
             setTimeout(setNextQuestion, 100);
         } else if (answer.startsWith(inputText)) {
-            questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
+            if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
-            questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
+            if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
         }
     }
 
     function checkQuizInput() {
+        const { inputElement, scoreElement, consecutiveCorrectElement, questionElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) return;
         const currentQuestion = questions[currentQuestionIndex];
-        const inputText = inputElement.value;
+        const inputText = inputElement ? inputElement.value : '';
 
         if (inputText.trim() === currentQuestion.answer) {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => {});
             score++;
             consecutiveCorrect++;
-            scoreElement.textContent = score;
-            consecutiveCorrectElement.textContent = consecutiveCorrect;
+            if (scoreElement) scoreElement.textContent = score;
+            if (consecutiveCorrectElement) consecutiveCorrectElement.textContent = consecutiveCorrect;
             currentQuestionIndex++;
-            inputElement.value = '';
+            if (inputElement) inputElement.value = '';
             setTimeout(setNextQuestion, 100);
         } else {
             incorrectSound.currentTime = 0;
             incorrectSound.play().catch(e => {});
             consecutiveCorrect = 0;
-            consecutiveCorrectElement.textContent = consecutiveCorrect;
-            questionElement.classList.add('incorrect');
+            if (consecutiveCorrectElement) consecutiveCorrectElement.textContent = consecutiveCorrect;
+            if (questionElement) questionElement.classList.add('incorrect');
             setTimeout(() => {
-                questionElement.classList.remove('incorrect');
+                if (questionElement) questionElement.classList.remove('incorrect');
             }, 300);
         }
     }
 
     function endGame() {
+        const { inputElement, messageElement, wpmElement, backButton, modeSelectionDiv } = getGameElements();
         stopTimer();
-        inputElement.disabled = true;
+        if (inputElement) inputElement.disabled = true;
         let endMessage = `ゲーム終了！ スコア: ${score}`;
         if (currentMode === 'タイピングモード') {
-            const finalWPM = wpmElement.textContent;
+            const finalWPM = wpmElement ? wpmElement.textContent : '0';
             endMessage += `, WPM: ${finalWPM}`;
         }
-        messageElement.textContent = endMessage;
-        messageElement.className = 'alert alert-success mt-4';
-        backButton.classList.remove('hidden');
-        modeSelectionDiv.classList.remove('hidden');
+        if (messageElement) {
+            messageElement.textContent = endMessage;
+            messageElement.className = 'alert alert-success mt-4';
+        }
+        if (backButton) backButton.classList.remove('hidden');
+        if (modeSelectionDiv) modeSelectionDiv.classList.remove('hidden');
     }
 
     function goBackToSelection() {
-        gameScreen.classList.add('hidden');
-        selectionScreen.classList.remove('hidden');
+        const { gameScreen, selectionScreen, modeSelectionDiv } = getGameElements();
+        if (gameScreen) gameScreen.classList.add('hidden');
+        if (selectionScreen) selectionScreen.classList.remove('hidden');
         currentMode = null;
         currentQuizCategory = null;
         loadTopics();
-        modeSelectionDiv.classList.add('hidden');
+        if (modeSelectionDiv) modeSelectionDiv.classList.add('hidden');
     }
 
     // --- Event Listeners ---
@@ -644,26 +722,59 @@ EU(いーゆー)
         if (e.key === 'Enter') checkPassword();
     });
 
-    inputElement.addEventListener('input', () => {
-        if (currentMode === 'タイピングモード') {
-            checkTypingInput();
+    // Initial event listeners for elements that are always present
+    // Game-specific event listeners will be attached when the game screen is active
+
+    // This part is now handled by the main DOMContentLoaded listener
+
+    // Attach event listeners for game elements after they are available
+    function attachGameEventListeners() {
+        const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
+
+        if (inputElement) {
+            inputElement.oninput = null; // Clear previous listener
+            inputElement.onkeypress = null; // Clear previous listener
+            inputElement.addEventListener('input', () => {
+                if (currentMode === 'タイピングモード') {
+                    checkTypingInput();
+                }
+            });
+            inputElement.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && currentMode === 'クイズモード') {
+                    checkQuizInput();
+                }
+            });
         }
-    });
-    inputElement.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && currentMode === 'クイズモード') {
-            checkQuizInput();
+
+        if (backButton) {
+            backButton.onclick = null; // Clear previous listener
+            backButton.addEventListener('click', goBackToSelection);
         }
-    });
 
-    backButton.addEventListener('click', goBackToSelection);
+        if (easyModeButton) {
+            easyModeButton.onclick = null; // Clear previous listener
+            easyModeButton.addEventListener('click', () => {
+                startGame(false);
+            });
+        }
 
-    easyModeButton.addEventListener('click', () => {
-        startGame(false);
-    });
+        if (hardModeButton) {
+            hardModeButton.onclick = null; // Clear previous listener
+            hardModeButton.addEventListener('click', () => {
+                startGame(true);
+            });
+        }
 
-    hardModeButton.addEventListener('click', () => {
-        startGame(true);
-    });
+        if (startButton) {
+            startButton.onclick = null; // Clear previous listener
+            startButton.addEventListener('click', () => startGame(false));
+        }
+    }
 
-    startButton.addEventListener('click', () => startGame(false));
+    // Call attachGameEventListeners in resetGame to ensure listeners are attached when elements are ready
+    const originalResetGame = resetGame;
+    resetGame = () => {
+        originalResetGame();
+        attachGameEventListeners();
+    };
 });
