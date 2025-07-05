@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let time = 60;
     let timerInterval;
     let totalTypedChars = 0;
-    let currentMode = null; // 'タイピングモード' or 'クイズモード'
+    let currentMode = null;
+    let currentQuizCategory = null;
     let selectedTopicText = '';
 
     const CORRECT_PASSWORD = "shakai131";
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 内陸国(ないりくこく)
 南極大陸(なんきょくたいりく)
 日本列島(にほんれっとう)
-排他的経済水域(はいたてきけいざいすいいき)
+排他的経済水域(はいたてきけいざいしゅいき)
 バチカン市国(ばちかんしこく)
 白夜(びゃくや)
 標準時(ひょうじゅんじ)
@@ -257,7 +258,8 @@ EU(いーゆー)
 移民(いみん)`
         },
         'クイズモード': {
-            '地理クイズ': `
+            '地理クイズ': {
+                '世界と日本の姿': `
 世界の大州の１つ。ユーラシア大陸のヨーロッパ以外の地域の州(アジア州)
 六大州の１つ。地中海を挟んでヨーロッパの南に位置する。赤道を挟んで南北双方に広い面積をもつ唯一の大陸。(アフリカ州)
 六大陸の１つ。スエズ地峡の西側の部分を占める大陸。(アフリカ大陸)
@@ -323,54 +325,141 @@ EU(いーゆー)
 「領土」と「領空」の上空のこと。(領空)
 国家が領有する陸地のこと。(領土)
 ユーラシア、アフリカ、北アメリカ、南アメリカ、南極、オーストラリアの６つの大陸のこと。(六大陸)
-ユーラシア大陸北部に位置する連邦共和制国家。面積世界１位。首都はモスクワ。(ロシア連邦)
-`
-        },
+ユーラシア大陸北部に位置する連邦共和制国家。面積世界１位。首都はモスクワ。(ロシア連邦)`,
+                '世界各地の人々の生活と環境': `
+北半球の北極に近い地域でほぼ一年中氷や雪に覆われた気候帯。(寒帯)
+主に北米地域にすむシカ科に属する哺乳動物でトナカイのこと。(カリブー)
+カナダ北部などの氷雪地帯に住む先住民族。(イヌイット)
+カナダ北端あたりの地域で使用される、狩猟の旅先で圧雪ブロックを使って作る一時的なシェルターのこと。(イグルー)
+主にロシアのシベリア地方、カナダの南西部を除く大部分、北欧、東欧、北海道が属する気候帯。(亜寒帯（冷帯）)
+針のように細長く、堅い葉をつける樹木の総称。(針葉樹)
+ロシア語でシベリア地方の針葉樹林の意味。(タイガ)
+葉っぱが平たく丸みがあり、樹形も横に広がり丸い形をしている樹木の総称。(広葉樹)
+ロシアの郊外にある農園付き別荘のこと。(ダーチャ)
+年間を通して温暖な気候の地域。(温帯)
+地中海沿岸などのように夏に乾燥し、冬に雨が降る地域の気候名。(地中海性気候)
+温暖で季節の変化がはっきりし、季節による気温や降水量の変化が大きい地域の気候名。(温暖湿潤気候)
+ヨーロッパの大西洋沿岸の暖流の北大西洋海流と偏西風の影響で緯度が高いわりに寒くなく、一年を通して雨が降る気候名。(西岸海洋性気候)
+一般に1年間の降水量が 蒸発量よりも少ない地域 。(乾燥帯)
+乾燥帯のほとんどの場所は砂漠であり、水が無いが、例外的に水の出る場所のこと。(オアシス)
+アフリカ北部にあるサハラ砂漠の南に広がる半乾燥地域のこと。(サヘル)
+水と草をもとめて、家畜とともに広大な地域を移動するやりっぱなしな牧畜形態のこと。(遊牧)
+気候変動や人間の活動などによって植物が生育できにくくなること。(砂漠化)
+森林などに火を入れて草や木を焼きはらってのこった草木灰を肥料として作物を栽培する農業。(焼畑農業)
+もともと植生に覆われた土地が、不毛地になっていく現象のこと。(砂漠化)
+地球上で緯度が低く年中温暖な地域のこと。一年中、暑くて雨が多い。 地域によって、雨季と乾季がある。(熱帯)
+年間を通じて温暖で雨量の多い地域に形成される植生、またはその地域のこと。(熱帯雨林)
+熱帯および亜熱帯地域で森林を形成する常緑の高木や低木の総称。(マングローブ)
+さんごがつくった石灰質の骨格が、長い時間をかけて積み重なり海面近くまで高くなった「地形」のこと。(さんご礁)
+「将来の世代の欲求を満たしつつ、現在の世代の欲求も満足させるような開発」のこと。(持続可能な開発)
+日本では東京湾の平均海面を0mとし、そこから測って土地の高さを表したもの。(標高)
+牛や馬などの家畜を飼育小屋ではなく、牧草地などで飼うこと。(放牧)
+ペルーのアンデス高地など標高が高いため、１年中気温が低いことから森林が形成されない地域の気候名。(高山気候)
+南米に生息するラクダの仲間。アンデスの人々は荷物運搬の手段として利用してきた。(リャマ)
+ペルー南部を中心に生息するラクダの仲間。人間の衣類や織物用に毛をとるために家畜として飼われている。(アルパカ)
+中南米の高山地帯に住む人々は、高地の寒さや風を防ぐために、着る防寒具のこと。(ポンチョ)
+南米ペルーのアンデス山脈、標高約2450mの尾根に位置する古代インカ帝国の遺跡。(マチュピチュ)
+気候の共通性をもとに地球上を区分したときの区域のこと。(気候帯)
+気候帯をさらに細分化したもの。(気候区)
+南極などの一年中、や氷でおおわれている地域の気候名。(氷雪気候)
+短い夏に雪や氷が解けて、わずかに草やこけが生える地域の気候名。(ツンドラ気候)
+一年を通して雨がとても少ない地域の気候名。(砂漠気候)
+わずかに雨が降る季節があることから、わずかに樹木をふくんだ、たけの短い草原が広がる地域の気候名。(ステップ気候)
+一年中雨が降り、うっそうとした森林が広がる地域の気候名。(熱帯雨林気候)
+乾季と雨季とがはっきりしていてまばらな樹木とたけの長い草原が広がる地域の気候名。(サバナ気候)
+釈迦が広めた宗教。教典は「経」。(仏教)
+誰でも成仏できる、誰でも悟りを開くことができると教えられている仏教(大乗仏教)
+出家して悟りを開いた者だけが救われるとされている仏教。(上座部仏教)
+イエスが広めた宗教。聖地はエルサレムなど。教典は「聖書」。(キリスト教)
+ムハンマドが広めた宗教。聖地はエルサレムなど。教典は「コーラン」。飲酒や豚肉を食べることを禁じている。(イスラーム（イスラム教）)
+イスラム教で「許されたもの」を指すこと。(ハラル)
+インドで主に信仰されている宗教。牛は神の使いから牛肉は食べない。(ヒンドゥー教)
+唯一絶対の神ヤハウェを信仰するユダヤ人の民族宗教のこと。(ユダヤ教)
+イスラム教を信仰する人のこと。(ムスリム)`
+            }
+        }
     };
 
     function loadTopics() {
         topicList.innerHTML = '';
-        messageElement.textContent = 'モードを選択してください。';
+        let currentSelection = topics;
+        let backFunction = null;
+        let message = 'モードを選択してください。';
 
-        if (currentMode === null) {
-            Object.keys(topics).forEach(modeName => {
-                const button = document.createElement('a');
-                button.className = 'list-group-item list-group-item-action topic-button';
-                button.textContent = modeName;
-                button.onclick = () => selectMode(modeName);
-                topicList.appendChild(button);
-            });
-        } else {
-            Object.keys(topics[currentMode]).forEach(topicName => {
-                const button = document.createElement('a');
-                button.className = 'list-group-item list-group-item-action topic-button';
-                button.textContent = topicName;
-                button.onclick = () => selectTopic(topicName);
-                topicList.appendChild(button);
-            });
-            const backToModeButton = document.createElement('button');
-            backToModeButton.className = 'btn btn-secondary btn-block mt-3';
-            backToModeButton.textContent = 'モード選択に戻る';
-            backToModeButton.onclick = () => {
+        if (currentMode) {
+            currentSelection = topics[currentMode];
+            message = 'カテゴリを選択してください。';
+            backFunction = () => {
                 currentMode = null;
                 loadTopics();
             };
-            topicList.appendChild(backToModeButton);
+        }
+
+        if (currentMode === 'クイズモード' && currentQuizCategory) {
+            currentSelection = topics[currentMode][currentQuizCategory];
+            message = 'トピックを選択してください。';
+            backFunction = () => {
+                currentQuizCategory = null;
+                loadTopics();
+            };
+        }
+
+        messageElement.textContent = message;
+
+        Object.keys(currentSelection).forEach(name => {
+            const button = document.createElement('a');
+            button.className = 'list-group-item list-group-item-action topic-button';
+            button.textContent = name;
+            button.onclick = () => {
+                if (!currentMode) {
+                    selectMode(name);
+                } else if (currentMode === 'クイズモード' && !currentQuizCategory) {
+                    selectQuizCategory(name);
+                } else {
+                    selectTopic(name);
+                }
+            };
+            topicList.appendChild(button);
+        });
+
+        if (backFunction) {
+            const backButton = document.createElement('button');
+            backButton.className = 'btn btn-secondary btn-block mt-3';
+            backButton.textContent = '戻る';
+            backButton.onclick = backFunction;
+            topicList.appendChild(backButton);
         }
     }
 
     function selectMode(modeName) {
         currentMode = modeName;
+        if (modeName === 'タイピングモード') {
+            // タイピングモードはカテゴリがないので直接トピック選択へ
+            loadTopics();
+        } else {
+            // 他のモードはカテゴリ選択へ
+            loadTopics();
+        }
+    }
+
+    function selectQuizCategory(categoryName) {
+        currentQuizCategory = categoryName;
         loadTopics();
     }
 
     function selectTopic(topicName) {
-        correctSound.play();
+        correctSound.play().catch(e => {});
         correctSound.pause();
-        incorrectSound.play();
+        incorrectSound.play().catch(e => {});
         incorrectSound.pause();
 
-        const text = topics[currentMode][topicName];
+        let text;
+        if (currentMode === 'タイピングモード') {
+            text = topics[currentMode][topicName];
+        } else if (currentMode === 'クイズモード') {
+            text = topics[currentMode][currentQuizCategory][topicName];
+        }
+
         if (text) {
             selectedTopicText = text;
             parseQuestions(text);
@@ -387,11 +476,11 @@ EU(いーゆー)
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
             const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
             if (match) {
-                const answer = currentMode === 'タイピングモード' ? match[1].trim() : match[2].trim();
+                const answer = (currentMode === 'タイピングモード') ? match[1].trim() : match[2].trim();
                 return { display: match[1].trim(), answer: answer };
             }
             return null;
-        }).filter(q => q);
+        }).filter(q => q && q.display && q.answer);
     }
 
     function resetGame() {
@@ -495,7 +584,7 @@ EU(いーゆー)
 
         if (inputText === answer) {
             correctSound.currentTime = 0;
-            correctSound.play();
+            correctSound.play().catch(e => {});
             score++;
             totalTypedChars += answer.length;
             scoreElement.textContent = score;
@@ -516,7 +605,7 @@ EU(いーゆー)
 
         if (inputText.trim() === currentQuestion.answer) {
             correctSound.currentTime = 0;
-            correctSound.play();
+            correctSound.play().catch(e => {});
             score++;
             scoreElement.textContent = score;
             currentQuestionIndex++;
@@ -524,7 +613,7 @@ EU(いーゆー)
             setTimeout(setNextQuestion, 100);
         } else {
             incorrectSound.currentTime = 0;
-            incorrectSound.play();
+            incorrectSound.play().catch(e => {});
             questionElement.classList.add('incorrect');
             setTimeout(() => {
                 questionElement.classList.remove('incorrect');
@@ -550,6 +639,7 @@ EU(いーゆー)
         gameScreen.classList.add('hidden');
         selectionScreen.classList.remove('hidden');
         currentMode = null;
+        currentQuizCategory = null;
         loadTopics();
         modeSelectionDiv.classList.add('hidden');
     }
@@ -557,9 +647,7 @@ EU(いーゆー)
     // --- Event Listeners ---
     passwordSubmit.addEventListener('click', checkPassword);
     passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            checkPassword();
-        }
+        if (e.key === 'Enter') checkPassword();
     });
 
     inputElement.addEventListener('input', () => {
