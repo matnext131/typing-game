@@ -46,9 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    const CORRECT_PASSWORD = "shakai131";
-
-    function checkPassword() {
+    
         if (passwordInput.value === CORRECT_PASSWORD) {
             passwordScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
