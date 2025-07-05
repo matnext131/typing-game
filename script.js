@@ -38,10 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const CORRECT_PASSWORD = "shakai131";
 
     function checkPassword() {
-        // DEBUG: Bypass password check
-        passwordScreen.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        loadTopics();
+        if (passwordInput.value === CORRECT_PASSWORD) {
+            passwordScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+            loadTopics();
+        } else {
+            passwordMessage.textContent = 'パスワードが間違っています。';
+            passwordMessage.classList.remove('hidden');
+        }
     }
 
     const topics = {
@@ -320,7 +324,7 @@ EU(いーゆー)
 国家が領有する陸地のこと。(領土)
 ユーラシア、アフリカ、北アメリカ、南アメリカ、南極、オーストラリアの６つの大陸のこと。(六大陸)
 ユーラシア大陸北部に位置する連邦共和制国家。面積世界１位。首都はモスクワ。(ロシア連邦)
-
+`
         }
     };
 
@@ -551,13 +555,9 @@ EU(いーゆー)
     }
 
     // --- Event Listeners ---
-    passwordSubmit.addEventListener('click', () => {
-        console.log('入室ボタンがクリックされました！');
-        checkPassword();
-    });
+    passwordSubmit.addEventListener('click', checkPassword);
     passwordInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            console.log('Enterキーが押されました！');
             checkPassword();
         }
     });
