@@ -551,9 +551,15 @@ EU(いーゆー)
     }
 
     // --- Event Listeners ---
-    passwordSubmit.addEventListener('click', checkPassword);
+    passwordSubmit.addEventListener('click', () => {
+        console.log('入室ボタンがクリックされました！');
+        checkPassword();
+    });
     passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkPassword();
+        if (e.key === 'Enter') {
+            console.log('Enterキーが押されました！');
+            checkPassword();
+        }
     });
 
     inputElement.addEventListener('input', () => {
