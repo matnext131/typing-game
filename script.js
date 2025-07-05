@@ -46,18 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Game state variables
-    let questions = [];
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let time = 60;
-    let timerInterval;
-    let totalTypedChars = 0;
-    let consecutiveCorrect = 0;
-    let currentMode = null;
-    let currentQuizCategory = null;
-    let selectedTopicText = '';
-
     const CORRECT_PASSWORD = "shakai131";
 
     function checkPassword() {
