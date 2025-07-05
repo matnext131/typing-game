@@ -171,9 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ツンドラ気候(つんどらきこう)
 砂漠気候(さばくきこう)
 ステップ気候(すてっぷきこう)
-熱帯雨林気候(ne
-ttai
-rin
+熱帯雨林気候(nettaiurin
 kikou)
 サバナ気候(さばなきこう)
 仏教(ぶっきょう)
@@ -206,7 +204,8 @@ kikou)
 東北地方(とうほくちほう)
 経済特区(けいざいとっく)
 世界の工場(せかいのこうじょう)
-西部大開発(せいぶだいかいはつ)
+西部大開発(seibudai
+kaihatsu)
 経済格差(けいざいかくさ)
 ハングル(はんぐる)
 二期作(にきさく)
@@ -420,6 +419,7 @@ EU(いーゆー)
     }
 
     function selectTopic(topicName) {
+        console.log(`トピック選択: ${topicName}`);
         correctSound.play().catch(e => {});
         correctSound.pause();
         incorrectSound.play().catch(e => {});
@@ -445,6 +445,7 @@ EU(いーゆー)
     }
 
     function parseQuestions(text) {
+        console.log("問題の解析を開始");
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
             const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
             if (match) {
@@ -453,9 +454,11 @@ EU(いーゆー)
             }
             return null;
         }).filter(q => q && q.display && q.answer);
+        console.log(`解析後の問題数: ${questions.length}`);
     }
 
     function resetGame() {
+        console.log("resetGame function entered");
         inputElement.disabled = true;
         inputElement.value = '';
         messageElement.className = 'alert alert-info mt-4';
@@ -486,15 +489,19 @@ EU(いーゆー)
             startButton.style.display = 'none';
             messageElement.textContent = '難易度を選択してください';
         }
+        console.log("ゲームのリセット完了");
     }
 
     function startGame(isHardMode = false) {
+        console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
         if (questions.length === 0) {
             alert('問題がありません。');
+            console.error("startGameが呼び出されましたが、問題がありませんでした。");
             return;
         }
 
         if (isHardMode) {
+            console.log("問題をシャッフルします");
             for (let i = questions.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [questions[i], questions[j]] = [questions[j], questions[i]];
@@ -516,8 +523,12 @@ EU(いーゆー)
         timerElement.textContent = time;
         wpmElement.textContent = 0;
         consecutiveCorrectElement.textContent = 0;
+        
+        console.log("次の問題を設定します");
         setNextQuestion();
+        console.log("タイマーを開始します");
         startTimer();
+        console.log("ゲーム開始処理完了");
     }
 
     function setNextQuestion() {
@@ -613,8 +624,6 @@ EU(いーゆー)
         if (currentMode === 'タイピングモード') {
             const finalWPM = wpmElement.textContent;
             endMessage += `, WPM: ${finalWPM}`;
-        } else if (currentMode === 'クイズモード') {
-            endMessage += `, 連続正答数: ${consecutiveCorrect}`;
         }
         messageElement.textContent = endMessage;
         messageElement.className = 'alert alert-success mt-4';
