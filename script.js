@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
         function checkPassword() {
+        function checkPassword() {
         if (passwordInput.value === CORRECT_PASSWORD) {
             passwordScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
