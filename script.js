@@ -387,12 +387,11 @@ EU(いーゆー)
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
             const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
             if (match) {
-                // タイピングモードでは問題文そのものを答えに、クイズモードでは括弧内を答えにする
                 const answer = currentMode === 'タイピングモード' ? match[1].trim() : match[2].trim();
                 return { display: match[1].trim(), answer: answer };
             }
             return null;
-        }).filter(q => q && q.display && q.answer);
+        }).filter(q => q);
     }
 
     function resetGame() {
