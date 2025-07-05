@@ -38,14 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const CORRECT_PASSWORD = "shakai131";
 
     function checkPassword() {
-        if (passwordInput.value === CORRECT_PASSWORD) {
-            passwordScreen.classList.add('hidden');
-            mainContent.classList.remove('hidden');
-            loadTopics();
-        } else {
-            passwordMessage.textContent = 'パスワードが間違っています。';
-            passwordMessage.classList.remove('hidden');
-        }
+        // DEBUG: Bypass password check
+        passwordScreen.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        loadTopics();
     }
 
     const topics = {
