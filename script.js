@@ -291,7 +291,7 @@ OPEC(おぺっく)
         questions = text.split('\n').map(line => {
             const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
             if (match) {
-                return { display: match[1].trim(), answer: match[2].trim() };
+                return { display: match[1].trim(), answer: match[1].trim() };
             }
             return null;
         }).filter(q => q && q.display && q.answer);
