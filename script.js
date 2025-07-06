@@ -361,6 +361,11 @@ EU(いーゆー)
     };
 
     function loadTopics() {
+        const { topicList, messageElement } = getGameElements();
+        if (!topicList) {
+            console.error("topicList element not found.");
+            return;
+        }
         topicList.innerHTML = '';
         let currentSelection = topics;
         let backFunction = null;
