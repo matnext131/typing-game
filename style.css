@@ -1,0 +1,48 @@
+body {
+    background-color: #f0f8ff;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#question {
+    font-family: 'Meiryo', sans-serif;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+    text-decoration: underline;
+}
+
+#message {
+    font-size: 1.1rem;
+}
+
+#start-button {
+    transition: all 0.3s ease;
+}
+
+#start-button:hover {
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none;
+}
+
+.topic-button {
+    cursor: pointer;
+}
+
+.topic-button:hover {
+    background-color: #f8f9fa;
+}
