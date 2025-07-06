@@ -549,6 +549,7 @@ EU(いーゆー)
 
     function startGame(isHardMode = false) {
         console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
+        console.log("シャッフル前の問題:", questions.map(q => q.display));
         const { inputElement, messageElement, startButton, backButton, modeSelectionDiv, scoreElement, timerElement, wpmElement, consecutiveCorrectElement } = getGameElements();
 
         if (questions.length === 0) {
@@ -563,6 +564,7 @@ EU(いーゆー)
                 const j = Math.floor(Math.random() * (i + 1));
                 [questions[i], questions[j]] = [questions[j], questions[i]];
             }
+            console.log("シャッフル後の問題:", questions.map(q => q.display));
         }
 
         if (inputElement) {
@@ -640,12 +642,6 @@ EU(いーゆー)
         if (inputText === answer) {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => {});
-            score++;
-            totalTypedChars += answer.length;
-            if (scoreElement) scoreElement.textContent = score;
-            currentQuestionIndex++;
-            if (inputElement) inputElement.value = '';
-            setTimeout(setNextQuestion, 100);
         } else if (answer.startsWith(inputText)) {
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
