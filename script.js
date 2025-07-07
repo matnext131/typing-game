@@ -529,43 +529,39 @@ EU(いーゆー)
     function attachGameEventListeners() {
         const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
 
-        if (inputElement) {
-            inputElement.oninput = null; // Clear previous listener
-            inputElement.onkeypress = null; // Clear previous listener
-            inputElement.addEventListener('input', () => {
+        const replaceWithClone = (element) => {
+            if (element && element.parentNode) {
+                const newElement = element.cloneNode(true);
+                element.parentNode.replaceChild(newElement, element);
+                return newElement;
+            }
+            return null;
+        };
+
+        const newBackButton = replaceWithClone(backButton);
+        if (newBackButton) newBackButton.addEventListener('click', goBackToSelection);
+
+        const newEasyButton = replaceWithClone(easyModeButton);
+        if (newEasyButton) newEasyButton.addEventListener('click', () => startGame(false));
+
+        const newHardButton = replaceWithClone(hardModeButton);
+        if (newHardButton) newHardButton.addEventListener('click', () => startGame(true));
+
+        const newStartButton = replaceWithClone(startButton);
+        if (newStartButton) newStartButton.addEventListener('click', () => startGame(false));
+
+        const newInputElement = replaceWithClone(inputElement);
+        if (newInputElement) {
+            newInputElement.addEventListener('input', () => {
                 if (currentMode === 'タイピングモード') {
                     checkTypingInput();
                 }
             });
-            inputElement.addEventListener('keypress', (e) => {
+            newInputElement.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && currentMode === 'クイズモード') {
                     checkQuizInput();
                 }
             });
-        }
-
-        if (backButton) {
-            backButton.onclick = null; // Clear previous listener
-            backButton.addEventListener('click', goBackToSelection);
-        }
-
-        if (easyModeButton) {
-            easyModeButton.onclick = null; // Clear previous listener
-            easyModeButton.addEventListener('click', () => {
-                startGame(false);
-            });
-        }
-
-        if (hardModeButton) {
-            hardModeButton.onclick = null; // Clear previous listener
-            hardModeButton.addEventListener('click', () => {
-                startGame(true);
-            });
-        }
-        
-        if (startButton) {
-            startButton.onclick = null; // Clear previous listener
-            startButton.addEventListener('click', () => startGame(false));
         }
     }
 
@@ -735,60 +731,4 @@ EU(いーゆー)
     passwordInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') checkPassword();
     });
-
-    // Initial event listeners for elements that are always present
-    // Game-specific event listeners will be attached when the game screen is active
-
-    // This part is now handled by the main DOMContentLoaded listener
-
-    // Attach event listeners for game elements after they are available
-    function attachGameEventListeners() {
-        const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
-
-        if (inputElement) {
-            inputElement.oninput = null; // Clear previous listener
-            inputElement.onkeypress = null; // Clear previous listener
-            inputElement.addEventListener('input', () => {
-                if (currentMode === 'タイピングモード') {
-                    checkTypingInput();
-                }
-            });
-            inputElement.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && currentMode === 'クイズモード') {
-                    checkQuizInput();
-                }
-            });
-        }
-
-        if (backButton) {
-            backButton.onclick = null; // Clear previous listener
-            backButton.addEventListener('click', goBackToSelection);
-        }
-
-        if (easyModeButton) {
-            easyModeButton.onclick = null; // Clear previous listener
-            easyModeButton.addEventListener('click', () => {
-                startGame(false);
-            });
-        }
-
-        if (hardModeButton) {
-            hardModeButton.onclick = null; // Clear previous listener
-            hardModeButton.addEventListener('click', () => {
-                startGame(true);
-            });
-        }
-
-        if (startButton) {
-            startButton.onclick = null; // Clear previous listener
-            startButton.addEventListener('click', () => startGame(false));
-        }
-    }
-
-    // Call attachGameEventListeners in resetGame to ensure listeners are attached when elements are ready
-    const originalResetGame = resetGame;
-    resetGame = () => {
-        originalResetGame();
-        attachGameEventListeners();
-    };
 });
