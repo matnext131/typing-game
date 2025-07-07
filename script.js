@@ -455,10 +455,6 @@ EU(いーゆー)
     function selectTopic(topicName) {
         console.log(`トピック選択: ${topicName}`);
         const { selectionScreen, gameScreen } = getGameElements();
-        correctSound.play().catch(e => {});
-        correctSound.pause();
-        incorrectSound.play().catch(e => {});
-        incorrectSound.pause();
 
         let text;
         if (currentMode === 'タイピングモード') {
@@ -668,7 +664,11 @@ EU(いーゆー)
         if (inputText === answer) {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => {});
-        } else if (answer.startsWith(inputText)) {
+            score++;
+            totalTypedChars += answer.length;
+            if (scoreElement) scoreElement.textContent = score;
+            currentQuestionIndex++;
+            setNextQuestion();
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
             if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
