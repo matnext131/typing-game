@@ -454,7 +454,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 他国から来て働く人々。労働力不足を補う。(外国人労働者)
 強い国が弱い国や地域を支配し、資源や労働力を利用した場所。(植民地)
 国が公的に使うと決めた言語。書類や教育で使われる。(公用語)
-本来の居住地を離れて移動する人のこと。(移民)
+本来の居住地を離れて移動する人のこと。(移民)`
             }
         }
     };
@@ -780,7 +780,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         let endMessage = `ゲーム終了！ スコア: ${score}`;
         if (currentMode === 'タイピングモード') {
             const finalWPM = wpmElement ? wpmElement.textContent : '0';
-            endMessage += `, WPM: ${finalWPM}`;
+            endMessage += `, 毎分入力文字数: ${finalWPM}`;
         }
         if (messageElement) {
             messageElement.textContent = endMessage;
