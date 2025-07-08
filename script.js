@@ -550,7 +550,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     function parseQuestions(text) {
         console.log("問題の解析を開始");
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
-            const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
+            const match = line.match(/(.*)(?:（|\()([^）)]+)(?:）|\))$/);
             if (match) {
                 const answer = (currentMode === 'タイピングモード') ? match[1].trim() : match[2].trim();
                 return { display: match[1].trim(), answer: answer };
