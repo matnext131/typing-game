@@ -664,7 +664,7 @@ EU(いーゆー)
             totalTypedChars += answer.length;
             if (scoreElement) scoreElement.textContent = score;
             currentQuestionIndex++;
-            setNextQuestion();
+            setTimeout(setNextQuestion, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
             if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
