@@ -663,6 +663,7 @@ EU(いーゆー)
             score++;
             totalTypedChars += answer.length;
             if (scoreElement) scoreElement.textContent = score;
+            if (inputElement) inputElement.value = '';
             currentQuestionIndex++;
             setTimeout(setNextQuestion, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
