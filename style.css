@@ -1,25 +1,37 @@
 body {
-    background-color: #f0f8ff;
+    background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white; /* Change text color to be visible on the dark background */
+    background-color: #000; /* Fallback color */
+    font-family: 'Noto Sans JP', 'M PLUS Rounded 1c', sans-serif;
 }
 
 .container {
     max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background to the container */
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .card {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: rgba(255, 255, 255, 0.1); /* Make card background semi-transparent */
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #question {
-    font-family: 'Meiryo', sans-serif;
+    /* font-family: 'Meiryo', sans-serif; */
 }
 
 .correct {
-    color: green;
+    color: lightgreen;
 }
 
 .incorrect {
-    color: red;
+    color: lightcoral;
     text-decoration: underline;
 }
 
