@@ -58,3 +58,10 @@ body {
 .topic-button:hover {
     background-color: #f8f9fa;
 }
+
+.game-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
