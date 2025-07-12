@@ -573,6 +573,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         time = 60;
         totalTypedChars = 0;
         consecutiveCorrect = 0;
+        currentQuestionIndex = 0; // Reset question index
         if (scoreElement) scoreElement.textContent = score;
         if (timerElement) timerElement.textContent = time;
         if (wpmElement) wpmElement.textContent = 0;
