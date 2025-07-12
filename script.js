@@ -840,19 +840,8 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
         
-        // A bit of a hack to make the modal work without full jQuery
-        wallpaperModal.style.display = 'block';
-        wallpaperModal.classList.add('show');
-        document.body.classList.add('modal-open');
-
-        const closeModal = () => {
-            wallpaperModal.style.display = 'none';
-            wallpaperModal.classList.remove('show');
-            document.body.classList.remove('modal-open');
-        };
-
-        wallpaperModal.querySelector('.close').onclick = closeModal;
-        wallpaperModal.querySelector('[data-dismiss="modal"]').onclick = closeModal;
+        // Use Bootstrap's modal function
+        $(wallpaperModal).modal('show');
     }
 
     function goBackToSelection() {
