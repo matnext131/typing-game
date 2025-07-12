@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode = null;
     let currentQuizCategory = null;
     let selectedTopicText = '';
+    let isHardMode = false;
 
     const CORRECT_PASSWORD = "shakai131";
 
@@ -186,8 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
 ハラル(はらる)
 ヒンドゥー教(ひんどぅーきょう)
 ユダヤ教(ゆだやきょう)
-ムスリム(むすりむ) `,
-            'アジア州':`
+ムスリム(むすりむ)`,
+                'アジア州':`
 ヒマラヤ山脈(ひまらやさんみゃく)
 稲作(いなさく)
 季節風(きせつふう)
@@ -228,7 +229,7 @@ OPEC(おぺっく)
 メッカ(めっか)
 レアメタル(れあめたる)
 人工知能(じんこうちのう)`,
-            'ヨーロッパ州': `
+                'ヨーロッパ州': `
 暖流(だんりゅう)
 北大西洋海流(きたたいせいようかいりゅう)
 偏西風(へんせいふう)
@@ -381,7 +382,79 @@ EU(いーゆー)
 イスラム教で「許されたもの」を指すこと。(ハラル)
 インドで主に信仰されている宗教。牛は神の使いから牛肉は食べない。(ヒンドゥー教)
 唯一絶対の神ヤハウェを信仰するユダヤ人の民族宗教のこと。(ユダヤ教)
-イスラム教を信仰する人のこと。(ムスリム)`
+イスラム教を信仰する人のこと。(ムスリム)`,
+                'アジア州': `
+高い標高とアジア大陸の中央に位置していることから「世界の屋根」と呼ばれる。﻿(ヒマラヤ山脈)
+イネ（稲）を栽培して米を収穫すること。(稲作)
+日本では夏は南東の方向から、冬は北西の方向から吹く漢字３文字の風のこと。 (季節風)
+1年の中で降水量の多い時期（概ね1か月以上）のこと。(雨季)
+1年の内降水量の少ない時期（概ね1か月以上）のこと。(乾季)
+中国以外の国に住む中国系の人々のこと。(華人)
+インドで生まれた宗教で、多くの神様を信仰する。(ヒンドゥー教)
+アラビア半島で生まれた一神教で、アッラーを唯一神として崇拝する宗教。教をつけて答えよ。(イスラム教)
+他国に支配され、その国の領土として支配される地域。(植民地)
+イエス・キリストの教えに基づいている宗教で、そこには信者が多い。(キリスト教)
+経済発展をとげた韓国、台湾、香港、シンガポールの4つの国・地域のこと。英語を含めて答えなさい。(アジアNIES)
+テクノロジーを使った産業。カタカナを含めて答えなさい。(ハイテク産業)
+都市の人口増加に対応するため、計画的に作られた新しい街。(ニュータウン)
+中国の人口の9割以上を占める民族。(漢族)
+黄河の中下流域。小麦や大豆などの栽培がさかん。(華北)
+長江中下流域（中国中部の地域）。上海や南京などがある。(華中)
+南嶺山脈以南で、チュー川流域にあたる地域。稲作や茶の栽培がさかん。(華南)
+東北側外縁に存在する地域。小麦や大豆などの畑作がさかんな地域(東北地方)
+中国が外国への投資を呼び込むために得た特別な地域。(経済特区)
+多くの工場が、世界中の製品を生産している中国のこと。(世界の工場)
+中国西部の発展が遅れている地域を開発するプロジェクト。(西部大開発)
+国や地域、個人などにおける経済力の差のこと。(経済格差)
+朝鮮語（韓国語）を表記する表音文字。1443年につくられた。(ハングル)
+1年に2回作物を収穫すること。暖かいで行われる。(二期作)
+大規模な農園のこと。(プランテーション)
+熱帯や亜熱帯の海岸に生える塩水に強い植物。(マングローブ)
+東南アジア10カ国で作られた地域協力機構。アルファベットで答えなさい。(ASEAN)
+都市の中にあり、非常に貧しい人々が住む地域。(スラム)
+あぶやしから得られる食用油のこと。マーガリンやせっけんの材料に使われる。(パーム油)
+太陽光や風力など、使っても無くならないエネルギー源。(再生可能エネルギー)
+コンピューターやインターネットを使った技術産業。英語を含めて答えなさい。(ICT産業)
+イスラム教の聖典。(コーラン)
+国内で消費する食料のうち、国内で生産された割合を示す指標のこと。(食料自給率)
+1960年9月に設立された国際機関で、主要な石油輸出国によって構成されている組織。アルファベットで答えなさい。(OPEC)
+雨が少なく、乾燥した気候の地域。砂漠などがある。(乾燥帯)
+イスラム教の聖地。サウジアラビアにある。(メッカ)
+生産量が少なく、技術的・経済的に重要な金属のこと。(レアメタル)
+コンピュータが人間の知的能力を模倣して学習や推論、判断などを行う技術のこと。アルファベットで答えなさい。(AI)`,
+                'ヨーロッパ州': `
+温かい海水の流れ。寒い地域に暖かさをもたらす。(暖流)
+メキシコ湾流が大西洋を横断し、ヨーロッパに暖かさを運ぶ海流。(北大西洋海流)
+中緯度地域で西から東へ吹く風。天候に大きな影響を与える。(偏西風)
+氷河が削った谷に海水が入り込んでできた細長い入り江。(フィヨルド)
+言語や文化、歴史を共有する人々のまとまり。(民族)
+イエス・キリストの教えを基にした宗教。世界で最も信者が多い。(キリスト教)
+ヨーロッパの国々が経済や政治で協力する組織。1993年設立され本部は、ベルギーの首都ブリュッセル。アルファベット２文字。(EU)
+英語やドイツ語など、ヨーロッパ北部で話される言語グループ。(ゲルマン系言語)
+フランス語やスペイン語など、ローマ帝国の影響を受けた言語グループ。(ラテン系言語)
+ロシア語やポーランド語など、東ヨーロッパで話される言語グループ。(スラブ系言語)
+EU加盟国の多くで使われている共通通貨。(ユーロ)
+(バカンス)
+EUの前身。経済統合を目指した組織。アルファベット２文字。(EC)
+英仏海峡トンネルを通る高速鉄道。ロンドンとパリを結ぶ。(ユーロスター)
+大気汚染物質が雨に溶けて起こる環境問題。森林や建物を傷める。(酸性雨)
+ヨーロッパを流れる国際河川。工業地帯や交通の要所。(ライン川)
+複数の国を流れる川。利用には国際協力が必要。(国際河川)
+(脱炭素社会)
+人間の活動で地球の平均気温が上昇する現象。環境問題の一つ。(地球温暖化)
+太陽光や風力など、使っても無くならないエネルギー源。(再生可能エネルギー)
+環境を守りながら、経済や社会の発展を続けられる社会。(持続可能な社会)
+農村地域で自然や文化を楽しむ観光。(ルーラル・ツーリズム)
+自然環境を大切にしながら行う観光。(エコツーリズム)
+観光客が多すぎて、地域の環境や生活に悪影響を与える問題。カタカナで答えなさい。(オーバーツーリズム)
+郊外に車を停め、公共交通機関で都心に行く方式。(パークアンドライド)
+個人や地域間の収入や資産の差。(経済格差)
+国民全体の所得を表す指標。国の経済力を示す。アルファベット３文字。(GNI)
+最先端の科学技術を使う産業。IT産業など。カタカナ含めて答えなさい。(ハイテク産業)
+他国から来て働く人々。労働力不足を補う。(外国人労働者)
+強い国が弱い国や地域を支配し、資源や労働力を利用した場所。(植民地)
+国が公的に使うと決めた言語。書類や教育で使われる。(公用語)
+本来の居住地を離れて移動する人のこと。(移民)`
             }
         }
     };
@@ -455,10 +528,6 @@ EU(いーゆー)
     function selectTopic(topicName) {
         console.log(`トピック選択: ${topicName}`);
         const { selectionScreen, gameScreen } = getGameElements();
-        correctSound.play().catch(e => {});
-        correctSound.pause();
-        incorrectSound.play().catch(e => {});
-        incorrectSound.pause();
 
         let text;
         if (currentMode === 'タイピングモード') {
@@ -482,7 +551,7 @@ EU(いーゆー)
     function parseQuestions(text) {
         console.log("問題の解析を開始");
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
-            const match = line.match(/(.+?)(?:（|\()(.+?)(?:）|\))/);
+            const match = line.match(/(.*)(?:（|\()([^）)]+)(?:）|\))$/);
             if (match) {
                 const answer = (currentMode === 'タイピングモード') ? match[1].trim() : match[2].trim();
                 return { display: match[1].trim(), answer: answer };
@@ -533,47 +602,44 @@ EU(いーゆー)
     function attachGameEventListeners() {
         const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
 
-        if (inputElement) {
-            inputElement.oninput = null; // Clear previous listener
-            inputElement.onkeypress = null; // Clear previous listener
-            inputElement.addEventListener('input', () => {
+        const replaceWithClone = (element) => {
+            if (element && element.parentNode) {
+                const newElement = element.cloneNode(true);
+                element.parentNode.replaceChild(newElement, element);
+                return newElement;
+            }
+            return null;
+        };
+
+        const newBackButton = replaceWithClone(backButton);
+        if (newBackButton) newBackButton.addEventListener('click', goBackToSelection);
+
+        const newEasyButton = replaceWithClone(easyModeButton);
+        if (newEasyButton) newEasyButton.addEventListener('click', () => startGame(false));
+
+        const newHardButton = replaceWithClone(hardModeButton);
+        if (newHardButton) newHardButton.addEventListener('click', () => startGame(true));
+
+        const newStartButton = replaceWithClone(startButton);
+        if (newStartButton) newStartButton.addEventListener('click', () => startGame(false));
+
+        const newInputElement = replaceWithClone(inputElement);
+        if (newInputElement) {
+            newInputElement.addEventListener('input', () => {
                 if (currentMode === 'タイピングモード') {
                     checkTypingInput();
                 }
             });
-            inputElement.addEventListener('keypress', (e) => {
+            newInputElement.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && currentMode === 'クイズモード') {
                     checkQuizInput();
                 }
             });
         }
-
-        if (backButton) {
-            backButton.onclick = null; // Clear previous listener
-            backButton.addEventListener('click', goBackToSelection);
-        }
-
-        if (easyModeButton) {
-            easyModeButton.onclick = null; // Clear previous listener
-            easyModeButton.addEventListener('click', () => {
-                startGame(false);
-            });
-        }
-
-        if (hardModeButton) {
-            hardModeButton.onclick = null; // Clear previous listener
-            hardModeButton.addEventListener('click', () => {
-                startGame(true);
-            });
-        }
-        
-        if (startButton) {
-            startButton.onclick = null; // Clear previous listener
-            startButton.addEventListener('click', () => startGame(false));
-        }
     }
 
-    function startGame(isHardMode = false) {
+    function startGame(hardMode) {
+        isHardMode = hardMode;
         console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
         console.log("シャッフル前の問題:", questions.map(q => q.display));
         const { inputElement, messageElement, startButton, backButton, modeSelectionDiv, scoreElement, timerElement, wpmElement, consecutiveCorrectElement } = getGameElements();
@@ -668,7 +734,12 @@ EU(いーゆー)
         if (inputText === answer) {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => {});
-        } else if (answer.startsWith(inputText)) {
+            score++;
+            totalTypedChars += answer.length;
+            if (scoreElement) scoreElement.textContent = score;
+            if (inputElement) inputElement.value = '';
+            currentQuestionIndex++;
+            setTimeout(setNextQuestion, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
             if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
@@ -710,7 +781,7 @@ EU(いーゆー)
         let endMessage = `ゲーム終了！ スコア: ${score}`;
         if (currentMode === 'タイピングモード') {
             const finalWPM = wpmElement ? wpmElement.textContent : '0';
-            endMessage += `, WPM: ${finalWPM}`;
+            endMessage += `, 毎分入力文字数: ${finalWPM}`;
         }
         if (messageElement) {
             messageElement.textContent = endMessage;
@@ -718,6 +789,55 @@ EU(いーゆー)
         }
         if (backButton) backButton.classList.remove('hidden');
         if (modeSelectionDiv) modeSelectionDiv.classList.remove('hidden');
+
+        // Wallpaper reward logic
+        const scoreThreshold = 30;
+        const timeLimit = 60;
+        const isHardMode = document.getElementById('hard-mode-button').classList.contains('active');
+
+        let wallpapers = [];
+        if (currentMode === 'タイピングモード' && score >= 30) {
+            if (isHardMode) {
+                wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
+            } else {
+                wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+            }
+        } else if (currentMode === 'クイズモード' && consecutiveCorrect >= 30) {
+            if (isHardMode) {
+                wallpapers = ['wallpapers/quiz_hard/quiz_hard_01.jpg', 'wallpapers/quiz_hard/quiz_hard_02.jpg'];
+            } else {
+                wallpapers = ['wallpapers/quiz_easy/quiz_easy_01.jpg', 'wallpapers/quiz_easy/quiz_easy_02.jpg'];
+            }
+        }
+
+        if (wallpapers.length > 0) {
+            const randomIndex = Math.floor(Math.random() * wallpapers.length);
+            const selectedWallpaper = wallpapers[randomIndex];
+            showWallpaperModal(selectedWallpaper);
+        }
+    }
+
+    function showWallpaperModal(wallpaperUrl) {
+        const wallpaperModal = document.getElementById('wallpaper-modal');
+        const rewardWallpaper = document.getElementById('reward-wallpaper');
+        const downloadLink = document.getElementById('download-link');
+
+        rewardWallpaper.src = wallpaperUrl;
+        downloadLink.href = wallpaperUrl;
+        
+        // A bit of a hack to make the modal work without full jQuery
+        wallpaperModal.style.display = 'block';
+        wallpaperModal.classList.add('show');
+        document.body.classList.add('modal-open');
+
+        const closeModal = () => {
+            wallpaperModal.style.display = 'none';
+            wallpaperModal.classList.remove('show');
+            document.body.classList.remove('modal-open');
+        };
+
+        wallpaperModal.querySelector('.close').onclick = closeModal;
+        wallpaperModal.querySelector('[data-dismiss="modal"]').onclick = closeModal;
     }
 
     function goBackToSelection() {
@@ -735,60 +855,4 @@ EU(いーゆー)
     passwordInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') checkPassword();
     });
-
-    // Initial event listeners for elements that are always present
-    // Game-specific event listeners will be attached when the game screen is active
-
-    // This part is now handled by the main DOMContentLoaded listener
-
-    // Attach event listeners for game elements after they are available
-    function attachGameEventListeners() {
-        const { inputElement, backButton, easyModeButton, hardModeButton, startButton } = getGameElements();
-
-        if (inputElement) {
-            inputElement.oninput = null; // Clear previous listener
-            inputElement.onkeypress = null; // Clear previous listener
-            inputElement.addEventListener('input', () => {
-                if (currentMode === 'タイピングモード') {
-                    checkTypingInput();
-                }
-            });
-            inputElement.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && currentMode === 'クイズモード') {
-                    checkQuizInput();
-                }
-            });
-        }
-
-        if (backButton) {
-            backButton.onclick = null; // Clear previous listener
-            backButton.addEventListener('click', goBackToSelection);
-        }
-
-        if (easyModeButton) {
-            easyModeButton.onclick = null; // Clear previous listener
-            easyModeButton.addEventListener('click', () => {
-                startGame(false);
-            });
-        }
-
-        if (hardModeButton) {
-            hardModeButton.onclick = null; // Clear previous listener
-            hardModeButton.addEventListener('click', () => {
-                startGame(true);
-            });
-        }
-
-        if (startButton) {
-            startButton.onclick = null; // Clear previous listener
-            startButton.addEventListener('click', () => startGame(false));
-        }
-    }
-
-    // Call attachGameEventListeners in resetGame to ensure listeners are attached when elements are ready
-    const originalResetGame = resetGame;
-    resetGame = () => {
-        originalResetGame();
-        attachGameEventListeners();
-    };
 });
