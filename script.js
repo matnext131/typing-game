@@ -792,22 +792,27 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         if (modeSelectionDiv) modeSelectionDiv.classList.remove('hidden');
 
         // Wallpaper reward logic
-        const scoreThreshold = 30;
-        const timeLimit = 60;
-        const isHardMode = document.getElementById('hard-mode-button').classList.contains('active');
-
+        const easyThreshold = 20;
+        const hardThreshold = 30;
         let wallpapers = [];
-        if (currentMode === 'タイピングモード' && score >= 30) {
-            if (isHardMode) {
-                wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
-            } else {
-                wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+
+        if (currentMode === 'タイピングモード') {
+            const threshold = isHardMode ? hardThreshold : easyThreshold;
+            if (score >= threshold) {
+                if (isHardMode) {
+                    wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
+                } else {
+                    wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+                }
             }
-        } else if (currentMode === 'クイズモード' && consecutiveCorrect >= 30) {
-            if (isHardMode) {
-                wallpapers = ['wallpapers/quiz_hard/quiz_hard_01.jpg', 'wallpapers/quiz_hard/quiz_hard_02.jpg'];
-            } else {
-                wallpapers = ['wallpapers/quiz_easy/quiz_easy_01.jpg', 'wallpapers/quiz_easy/quiz_easy_02.jpg'];
+        } else if (currentMode === 'クイズモード') {
+            const threshold = isHardMode ? hardThreshold : easyThreshold;
+            if (consecutiveCorrect >= threshold) {
+                if (isHardMode) {
+                    wallpapers = ['wallpapers/quiz_hard/quiz_hard_01.jpg', 'wallpapers/quiz_hard/quiz_hard_02.jpg'];
+                } else {
+                    wallpapers = ['wallpapers/quiz_easy/quiz_easy_01.jpg', 'wallpapers/quiz_easy/quiz_easy_02.jpg'];
+                }
             }
         }
 
