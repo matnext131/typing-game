@@ -688,8 +688,17 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     function setNextQuestion() {
         const { questionElement, inputElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) {
-            endGame();
-            return;
+            if (isHardMode) {
+                // Hard mode: Reshuffle and reset index
+                for (let i = questions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [questions[i], questions[j]] = [questions[j], questions[i]];
+                }
+                console.log("問題を再シャッフルしました。");
+            }
+            // Reset index for both modes to loop
+            currentQuestionIndex = 0;
+            console.log("問題が尽きたため、最初に戻ります。");
         }
         if (questionElement) questionElement.textContent = questions[currentQuestionIndex].display;
         if (inputElement) inputElement.value = '';
