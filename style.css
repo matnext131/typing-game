@@ -65,3 +65,76 @@ body {
     align-items: center;
     width: 100%;
 }
+
+.game-stats h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.game-stats p {
+    margin-bottom: 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+#password-screen .card {
+    max-width: 500px;
+    margin: 50px auto;
+}
+
+#password-message {
+    min-height: 24px;
+}
+
+#mode-selection button {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+}
+
+#back-to-selection {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+#back-to-selection:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.modal-content {
+    background-color: #343a40;
+    color: white;
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.modal-body p {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .game-stats {
+        flex-direction: column;
+    }
+
+    .game-stats > div {
+        margin-bottom: 1rem;
+    }
+
+    #mode-selection button {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

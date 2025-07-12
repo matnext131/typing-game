@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode = null;
     let currentQuizCategory = null;
     let selectedTopicText = '';
+    let isHardMode = false;
 
     const CORRECT_PASSWORD = "shakai131";
 
@@ -572,6 +573,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         time = 60;
         totalTypedChars = 0;
         consecutiveCorrect = 0;
+        currentQuestionIndex = 0; // Reset question index
         if (scoreElement) scoreElement.textContent = score;
         if (timerElement) timerElement.textContent = time;
         if (wpmElement) wpmElement.textContent = 0;
@@ -637,7 +639,8 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         }
     }
 
-    function startGame(isHardMode = false) {
+    function startGame(hardMode) {
+        isHardMode = hardMode;
         console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
         console.log("シャッフル前の問題:", questions.map(q => q.display));
         const { inputElement, messageElement, startButton, backButton, modeSelectionDiv, scoreElement, timerElement, wpmElement, consecutiveCorrectElement } = getGameElements();
@@ -685,8 +688,17 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     function setNextQuestion() {
         const { questionElement, inputElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) {
-            endGame();
-            return;
+            if (isHardMode) {
+                // Hard mode: Reshuffle and reset index
+                for (let i = questions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [questions[i], questions[j]] = [questions[j], questions[i]];
+                }
+                console.log("問題を再シャッフルしました。");
+            }
+            // Reset index for both modes to loop
+            currentQuestionIndex = 0;
+            console.log("問題が尽きたため、最初に戻ります。");
         }
         if (questionElement) questionElement.textContent = questions[currentQuestionIndex].display;
         if (inputElement) inputElement.value = '';
@@ -735,9 +747,15 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             score++;
             totalTypedChars += answer.length;
             if (scoreElement) scoreElement.textContent = score;
-            if (inputElement) inputElement.value = '';
+            if (inputElement) {
+                inputElement.value = '';
+                inputElement.disabled = true; // 入力フィールドを一時的に無効化
+            }
             currentQuestionIndex++;
-            setTimeout(setNextQuestion, 100);
+            setTimeout(() => {
+                setNextQuestion();
+                if (inputElement) inputElement.disabled = false; // 新しい問題がセットされたら有効化
+            }, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
             if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
@@ -787,6 +805,49 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         }
         if (backButton) backButton.classList.remove('hidden');
         if (modeSelectionDiv) modeSelectionDiv.classList.remove('hidden');
+
+        // Wallpaper reward logic
+        const easyThreshold = 20;
+        const hardThreshold = 30;
+        let wallpapers = [];
+
+        if (currentMode === 'タイピングモード') {
+            const threshold = isHardMode ? hardThreshold : easyThreshold;
+            if (score >= threshold) {
+                if (isHardMode) {
+                    wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
+                } else {
+                    wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+                }
+            }
+        } else if (currentMode === 'クイズモード') {
+            const threshold = isHardMode ? hardThreshold : easyThreshold;
+            if (consecutiveCorrect >= threshold) {
+                if (isHardMode) {
+                    wallpapers = ['wallpapers/quiz_hard/quiz_hard_01.jpg', 'wallpapers/quiz_hard/quiz_hard_02.jpg'];
+                } else {
+                    wallpapers = ['wallpapers/quiz_easy/quiz_easy_01.jpg', 'wallpapers/quiz_easy/quiz_easy_02.jpg'];
+                }
+            }
+        }
+
+        if (wallpapers.length > 0) {
+            const randomIndex = Math.floor(Math.random() * wallpapers.length);
+            const selectedWallpaper = wallpapers[randomIndex];
+            showWallpaperModal(selectedWallpaper);
+        }
+    }
+
+    function showWallpaperModal(wallpaperUrl) {
+        const wallpaperModal = document.getElementById('wallpaper-modal');
+        const rewardWallpaper = document.getElementById('reward-wallpaper');
+        const downloadLink = document.getElementById('download-link');
+
+        rewardWallpaper.src = wallpaperUrl;
+        downloadLink.href = wallpaperUrl;
+        
+        // Use Bootstrap's modal function
+        $(wallpaperModal).modal('show');
     }
 
     function goBackToSelection() {
