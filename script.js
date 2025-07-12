@@ -747,9 +747,15 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             score++;
             totalTypedChars += answer.length;
             if (scoreElement) scoreElement.textContent = score;
-            if (inputElement) inputElement.value = '';
+            if (inputElement) {
+                inputElement.value = '';
+                inputElement.disabled = true; // 入力フィールドを一時的に無効化
+            }
             currentQuestionIndex++;
-            setTimeout(setNextQuestion, 100);
+            setTimeout(() => {
+                setNextQuestion();
+                if (inputElement) inputElement.disabled = false; // 新しい問題がセットされたら有効化
+            }, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
             if (questionElement) questionElement.innerHTML = `<span class="incorrect">${currentQuestion.display}</span>`;
