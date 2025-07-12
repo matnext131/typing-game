@@ -749,12 +749,12 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             if (scoreElement) scoreElement.textContent = score;
             if (inputElement) {
                 inputElement.value = '';
-                inputElement.disabled = true; // 入力フィールドを一時的に無効化
+                // inputElement.disabled = true; // 入力フィールドを一時的に無効化 (削除)
             }
             currentQuestionIndex++;
             setTimeout(() => {
                 setNextQuestion();
-                if (inputElement) inputElement.disabled = false; // 新しい問題がセットされたら有効化
+                if (inputElement) inputElement.focus(); // 新しい問題がセットされたらフォーカスを戻す
             }, 100);
             if (questionElement) questionElement.innerHTML = `<span>${currentQuestion.display}</span>`;
         } else {
