@@ -848,6 +848,8 @@ EU(いーゆー)
 
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
+        const fileName = wallpaperUrl.split('/').pop();
+        downloadLink.download = fileName;
         
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
