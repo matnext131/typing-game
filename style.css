@@ -1,0 +1,140 @@
+body {
+    background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white; /* Change text color to be visible on the dark background */
+    background-color: #000; /* Fallback color */
+    font-family: 'Noto Sans JP', 'M PLUS Rounded 1c', sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background to the container */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: rgba(255, 255, 255, 0.1); /* Make card background semi-transparent */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#question {
+    /* font-family: 'Meiryo', sans-serif; */
+}
+
+.correct {
+    color: lightgreen;
+}
+
+.incorrect {
+    color: lightcoral;
+    text-decoration: underline;
+}
+
+#message {
+    font-size: 1.1rem;
+}
+
+#start-button {
+    transition: all 0.3s ease;
+}
+
+#start-button:hover {
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none;
+}
+
+.topic-button {
+    cursor: pointer;
+}
+
+.topic-button:hover {
+    background-color: #f8f9fa;
+}
+
+.game-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.game-stats h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.game-stats p {
+    margin-bottom: 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+#password-screen .card {
+    max-width: 500px;
+    margin: 50px auto;
+}
+
+#password-message {
+    min-height: 24px;
+}
+
+#mode-selection button {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+}
+
+#back-to-selection {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+#back-to-selection:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.modal-content {
+    background-color: #343a40;
+    color: white;
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.modal-body p {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .game-stats {
+        flex-direction: column;
+    }
+
+    .game-stats > div {
+        margin-bottom: 1rem;
+    }
+
+    #mode-selection button {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
