@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalTypedChars = 0;
     let consecutiveCorrect = 0;
     let currentMode = null;
+    let currentTypingCategory = null; // Added for typing sub-category
     let currentQuizCategory = null;
     let selectedTopicText = '';
     let isHardMode = false;
@@ -61,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const topics = {
         'タイピングモード': {
-            '第１編世界と日本の姿': `
+            '地理モード': {
+                '第１編世界と日本の姿': `
 アジア州(あじあしゅう)
 アフリカ州(あふりかしゅう)
 アフリカ大陸(あふりかたいりく)
@@ -128,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 領土(りょうど)
 六大陸(ろくたいりく)
 ロシア連邦(ろしあれんぽう)`,
-            '日本の地理': `北海道(ほっかいどう)
+                '日本の地理': `北海道(ほっかいどう)
 本州(ほんしゅう)
 四国(しこく)
 九州(きゅうしゅう)
@@ -138,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 利根川(とねがわ)
 石狩平野(いしかりへいや)
 関東平野(かんとうへいや)`,
-            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`
+                '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`
 寒帯(かんたい)
 カリブー(かりぶー)
 イヌイット(いぬいっと)
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 温帯(おんたい)
 地中海性気候(ちちゅうかいせいきこう)
 温暖湿潤気候(おんだんしつじゅんきこう)
-西岸海洋性気候(せいがんかいようせいきこう)
+西岸海洋性気候(seigan kaiyousei kikou)
 乾燥帯(かんそうたい)
 オアシス(おあしす)
 サヘル(さへる)
@@ -188,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ヒンドゥー教(ひんどぅーきょう)
 ユダヤ教(ゆだやきょう)
 ムスリム(むすりむ)`,
-                'アジア州':`
+                    'アジア州':`
 ヒマラヤ山脈(ひまらやさんみゃく)
 稲作(いなさく)
 季節風(きせつふう)
@@ -229,7 +231,7 @@ OPEC(おぺっく)
 メッカ(めっか)
 レアメタル(れあめたる)
 人工知能(じんこうちのう)`,
-                'ヨーロッパ州': `
+                    'ヨーロッパ州': `
 暖流(だんりゅう)
 北大西洋海流(きたたいせいようかいりゅう)
 偏西風(へんせいふう)
@@ -263,6 +265,109 @@ EU(いーゆー)
 植民地(しょくみんち)
 公用語(こうようご)
 移民(いみん)`
+            },
+            '歴史モード': {
+                '古代文明と宗教のおこり': `
+猿人(えんじん)
+氷河時代(ひょうがじだい)
+打製石器(だせいせっき)
+原人(げんじん)
+新人(しんじん)
+クロマニョン人(くろまにょんじん)
+旧石器時代(きゅうせっきじだい)
+岩宿遺跡(いわじゅくいせき)
+土器(どき)
+磨製石器(ませいせっき)
+新石器時代(しんせっきじだい)
+農耕(のうこう)
+牧畜(ぼくちく)
+青銅器(せいどうき)
+鉄器(てっき)
+文明(ぶんめい)
+エジプト文明(えじぷとぶんめい)
+太陽暦(たいようれき)
+象形文字(しょうけいもじ)
+メソポタミア文明(めそぽたみあぶんめい)
+くさび形文字(くさびがたもじ)
+太陰暦(たいいんれき)
+60進法(60しんほう)
+七曜制(しちようせい)
+オリエント(おりえんと)
+ハンムラビ法典(はんむらびほうてん)
+インダス文明(いんだすぶんめい)
+モヘンジョ・ダロ(もへんじょ・だろ)
+カースト制(かーすとせい)
+中国文明(ちゅうごくぶんめい)
+殷(いん)
+甲骨文字(こうこつもじ)
+春秋・戦国時代(しゅんじゅう・せんごくじだい)
+孔子(こうし)
+儒学(じゅがく)
+秦(しん)
+始皇帝(しこうてい)
+万里の長城(ばんりのちょうじょう)
+漢(かん)
+シルクロード(しるくろーど)
+ポリス(ぽりす)
+民主政(みんしゅせい)
+ギリシャ文明(ぎりしゃぶんめい)
+アレクサンドロス大王(あれくさんどろすだいおう)
+パルテノン神殿(ぱるてのんしんでん)
+ヘレニズム(へれにずむ)
+共和政(きょうわせい)
+帝政(ていせい)
+ローマ帝国(ろーまていこく)
+シャカ(しゃか)
+仏教(ぶっきょう)
+ユダヤ教(ゆだやきょう)
+イエス(いえす)
+キリスト教(きりすときょう)
+ムハンマド(むはんまど)
+イスラーム(いすらーむ)
+エルサレム(えるされむ)`,
+                '日本列島の誕生と大陸との交流': `
+岩宿遺跡(いわじゅくいせき)
+黒曜石(こくようせき)
+縄文土器(じょうもんどき)
+縄文時代(じょうもんじだい)
+三内丸山遺跡(さんないまるやまいせき)
+貝塚(かいづか)
+たて穴住居(たてあなじゅうきょ)
+土偶(どぐう)
+屈葬(くっそう)
+稲作(いなさく)
+高床倉庫(たかゆかそうこ)
+弥生土器(やよいどき)
+弥生時代(やよいじだい)
+銅鐸(どうたく)
+「漢書」地理志(「かんじょ」ちりし)
+「後漢書」東夷伝(「ごかんじょ」とういでん)
+漢委奴国王(かんのわのなのこくおう)
+邪馬台国(やまたいこく)
+魏志倭人伝(ぎしわじんでん)
+卑弥呼(ひみこ)
+朝貢(ちょうこう)
+親魏倭王(しんぎわおう)
+吉野ヶ里遺跡(よしのがりいせき)
+登呂遺跡(とろいせき)
+豪族(ごうぞく)
+大和政権(やまとせいけん)
+古墳(こふん)
+古墳時代(こふんじだい)
+大王(おおきみ)
+大仙古墳(だいせんこふん)
+埴輪(はにわ)
+前方後円墳(ぜんぽうこうえんふん)
+稲荷山古墳(いなりやまこふん)
+江田船山古墳(えたふなやまこふん)
+高句麗(こうくり)
+百済(くだら)
+新羅(しらぎ)
+伽耶地域(かやちいき)
+「宋書」倭国伝(「そうしょ」わこくでん)
+渡来人(とらいじん)
+須恵器(すえき)`
+            }
         },
         'クイズモード': {
             '地理クイズ': {
@@ -346,7 +451,7 @@ EU(いーゆー)
 温帯(おんたい)
 地中海性気候(ちちゅうかいせいきこう)
 温暖湿潤気候(おんだんしつじゅんきこう)
-西岸海洋性気候(せいがんかいようせいきこう)
+西岸海洋性気候(seigan kaiyousei kikou)
 乾燥帯(かんそうたい)
 オアシス(おあしす)
 サヘル(さへる)
@@ -482,6 +587,15 @@ EU(いーゆー)
             };
         }
 
+        if (currentMode === 'タイピングモード' && currentTypingCategory) {
+            currentSelection = topics[currentMode][currentTypingCategory];
+            message = 'トピックを選択してください。';
+            backFunction = () => {
+                currentTypingCategory = null;
+                loadTopics();
+            };
+        }
+
         if (currentMode === 'クイズモード' && currentQuizCategory) {
             currentSelection = topics[currentMode][currentQuizCategory];
             message = 'トピックを選択してください。';
@@ -500,6 +614,8 @@ EU(いーゆー)
             button.onclick = () => {
                 if (!currentMode) {
                     selectMode(name);
+                } else if (currentMode === 'タイピングモード' && !currentTypingCategory) {
+                    selectTypingCategory(name);
                 } else if (currentMode === 'クイズモード' && !currentQuizCategory) {
                     selectQuizCategory(name);
                 } else {
@@ -523,6 +639,11 @@ EU(いーゆー)
         loadTopics();
     }
 
+    function selectTypingCategory(categoryName) {
+        currentTypingCategory = categoryName;
+        loadTopics();
+    }
+
     function selectQuizCategory(categoryName) {
         currentQuizCategory = categoryName;
         loadTopics();
@@ -534,7 +655,7 @@ EU(いーゆー)
 
         let text;
         if (currentMode === 'タイピングモード') {
-            text = topics[currentMode][topicName];
+            text = topics[currentMode][currentTypingCategory][topicName];
         } else if (currentMode === 'クイズモード') {
             text = topics[currentMode][currentQuizCategory][topicName];
         }
@@ -859,6 +980,7 @@ EU(いーゆー)
         if (gameScreen) gameScreen.classList.add('hidden');
         if (selectionScreen) selectionScreen.classList.remove('hidden');
         currentMode = null;
+        currentTypingCategory = null;
         currentQuizCategory = null;
         loadTopics();
         if (modeSelectionDiv) modeSelectionDiv.classList.add('hidden');
