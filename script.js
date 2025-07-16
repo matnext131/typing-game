@@ -942,10 +942,18 @@ EU(いーゆー)
         if (currentMode === 'タイピングモード') {
             const threshold = isHardMode ? hardThreshold : easyThreshold;
             if (score >= threshold) {
-                if (isHardMode) {
-                    wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
-                } else {
-                    wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+                if (currentTypingCategory === '地理モード') {
+                    if (isHardMode) {
+                        wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
+                    } else {
+                        wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
+                    }
+                } else if (currentTypingCategory === '歴史モード') {
+                    if (isHardMode) {
+                        wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg']; // You can change this to history specific wallpapers
+                    } else {
+                        wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg']; // You can change this to history specific wallpapers
+                    }
                 }
             }
         } else if (currentMode === 'クイズモード') {
@@ -973,7 +981,6 @@ EU(いーゆー)
 
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
-        downloadLink.download = wallpaperUrl.split('/').pop();
         
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
