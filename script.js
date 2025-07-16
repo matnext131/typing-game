@@ -660,15 +660,19 @@ EU(いーゆー)
             text = topics[currentMode][currentQuizCategory][topicName];
         }
 
-        if (text) {
+        if (typeof text === 'string') {
             selectedTopicText = text;
             parseQuestions(text);
             if (selectionScreen) selectionScreen.classList.add('hidden');
             if (gameScreen) gameScreen.classList.remove('hidden');
             resetGame();
         } else {
-            console.error('Selected topic not found:', topicName);
-            alert('選択されたトピックが見つかりませんでした。');
+            console.error('Selected topic not found or is not a string:', topicName);
+            // Handle cases where a category is clicked, not a topic
+            if (currentMode === 'タイピングモード') {
+                currentTypingCategory = topicName;
+            }
+            loadTopics();
         }
     }
 
