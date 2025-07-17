@@ -1173,10 +1173,11 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         if (wallpapers.length > 0) {
             const randomIndex = Math.floor(Math.random() * wallpapers.length);
             const selectedWallpaper = wallpapers[randomIndex];
-            showWallpaperModal(selectedWallpaper);
+            // showWallpaperModal(selectedWallpaper);
         }
     }
 
+    /*
     function showWallpaperModal(wallpaperUrl) {
         const wallpaperModal = document.getElementById('wallpaper-modal');
         const rewardWallpaper = document.getElementById('reward-wallpaper');
@@ -1188,6 +1189,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
     }
+*/
 
     function goBackToSelection() {
         const { gameScreen, selectionScreen, modeSelectionDiv } = getGameElements();
