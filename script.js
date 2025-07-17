@@ -1184,9 +1184,6 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
-        const filename = wallpaperUrl.split('/').pop();
-        const lastDotIndex = filename.lastIndexOf('.');
-        downloadLink.download = (lastDotIndex > -1 ? filename.substring(0, lastDotIndex) : filename) + '.jpg';
         
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
