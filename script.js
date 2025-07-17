@@ -1,4 +1,4 @@
-console.log("SCRIPT VERSION: 2025-07-17-FINAL-ATTEMPT");
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Sound elements
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 インド洋(いんどよう)
 択捉島(えとろふとう)
 オーストラリア大陸(おーすとらりあたいりく)
-沖ノ鳥島(おきのしま)
+沖ノ鳥島(おきのとりしま)
 オセアニア州(おせあにあしゅう)
 海洋(かいよう)
 北アメリカ州(きたあめりかしゅう)
@@ -181,7 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
 ツンドラ気候(つんどらきこう)
 砂漠気候(さばくきこう)
 ステップ気候(すてっぷきこう)
-熱帯雨林気候(ねったいうりんきこう)
+熱帯雨林気候(ne
+ttaiu
+rin
+kikou)
 サバナ気候(サバナきこう)
 仏教(ぶっきょう)
 大乗仏教(だいじょうぶっきょう)
@@ -685,7 +688,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 鉄製の道具。かたくて熱に強いという利点がある。(鉄器)
 人間が作り出した高度な文化や社会のこと。(文明)
 ナイル川流域に発展した古代文明。(エジプト文明)
-太陽の動きにもとづく暦。(太陽暦)
+太陽暦(たいようれき)
 ものの形をかたどった文字で、パピルスという一種の紙に書かれた。(象形文字)
 今のイラク付近のチグリス川とユーフラテス川のほとりに生まれた文明(メソポタミア文明)
 くさび形文字(くさびがたもじ)
@@ -1174,11 +1177,10 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         if (wallpapers.length > 0) {
             const randomIndex = Math.floor(Math.random() * wallpapers.length);
             const selectedWallpaper = wallpapers[randomIndex];
-            // showWallpaperModal(selectedWallpaper);
+            showWallpaperModal(selectedWallpaper);
         }
     }
 
-/*
     function showWallpaperModal(wallpaperUrl) {
         const wallpaperModal = document.getElementById('wallpaper-modal');
         const rewardWallpaper = document.getElementById('reward-wallpaper');
@@ -1186,11 +1188,15 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
+
+        const filename = wallpaperUrl.split('/').pop();
+        const lastDotIndex = filename.lastIndexOf('.');
+        const filenameWithoutExt = lastDotIndex > -1 ? filename.substring(0, lastDotIndex) : filename;
+        downloadLink.download = filenameWithoutExt + '.jpg';
         
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
     }
-*/
 
     function goBackToSelection() {
         const { gameScreen, selectionScreen, modeSelectionDiv } = getGameElements();
