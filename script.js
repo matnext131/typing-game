@@ -50,11 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
         function checkPassword() {
+        console.log("checkPassword function called.");
+        console.log("Entered password:", passwordInput.value);
+        console.log("Correct password:", CORRECT_PASSWORD);
         if (passwordInput.value === CORRECT_PASSWORD) {
+            console.log("Password is correct.");
             passwordScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
             loadTopics();
         } else {
+            console.log("Password is incorrect.");
             passwordMessage.textContent = 'パスワードが間違っています。';
             passwordMessage.classList.remove('hidden');
         }
