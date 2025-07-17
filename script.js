@@ -1173,23 +1173,26 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         if (wallpapers.length > 0) {
             const randomIndex = Math.floor(Math.random() * wallpapers.length);
             const selectedWallpaper = wallpapers[randomIndex];
-            // showWallpaperModal(selectedWallpaper);
+            showWallpaperModal(selectedWallpaper);
         }
     }
 
-    /*
-    function showWallpaperModal(wallpaperUrl) {
+        function showWallpaperModal(wallpaperUrl) {
         const wallpaperModal = document.getElementById('wallpaper-modal');
         const rewardWallpaper = document.getElementById('reward-wallpaper');
         const downloadLink = document.getElementById('download-link');
 
         rewardWallpaper.src = wallpaperUrl;
         downloadLink.href = wallpaperUrl;
+
+        const filename = wallpaperUrl.split('/').pop();
+        const lastDotIndex = filename.lastIndexOf('.');
+        const filenameWithoutExt = lastDotIndex > -1 ? filename.substring(0, lastDotIndex) : filename;
+        downloadLink.download = filenameWithoutExt + '.jpg';
         
         // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
     }
-*/
 
     function goBackToSelection() {
         const { gameScreen, selectionScreen, modeSelectionDiv } = getGameElements();
