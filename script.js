@@ -1,6 +1,3 @@
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // Sound elements
     const correctSound = document.getElementById('correct-sound');
@@ -22,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalTypedChars = 0;
     let consecutiveCorrect = 0;
     let currentMode = null;
-    let currentTypingCategory = null; // Added for typing sub-category
+    let currentTypingCategory = null;
     let currentQuizCategory = null;
     let selectedTopicText = '';
     let isHardMode = false;
@@ -51,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    
-        function checkPassword() {
+    function checkPassword() {
         if (passwordInput.value === CORRECT_PASSWORD) {
             passwordScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
@@ -64,9 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const topics = {
-    'タイピングモード': {
-        '地理モード': {
-            '第１編世界と日本の姿': `
+        'タイピングモード': {
+            '地理モード': {
+                '第１編世界と日本の姿': `
 アジア州(あじあしゅう)
 アフリカ州(あふりかしゅう)
 アフリカ大陸(あふりかたいりく)
@@ -133,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 領土(りょうど)
 六大陸(ろくたいりく)
 ロシア連邦(ろしあれんぽう)`,
-            '日本の地理': `北海道(ほっかいどう)
+                '日本の地理': `北海道(ほっかいどう)
 本州(ほんしゅう)
 四国(しこく)
 九州(きゅうしゅう)
@@ -143,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 利根川(とねがわ)
 石狩平野(いしかりへいや)
 関東平野(かんとうへいや)`,
-            '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`
+                '第２編世界のさまざまな地域第１章世界各地の人々の生活と環境':`
 寒帯(かんたい)
 カリブー(かりぶー)
 イヌイット(いぬいっと)
@@ -192,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ヒンドゥー教(ひんどぅーきょう)
 ユダヤ教(ゆだやきょう)
 ムスリム(むすりむ)`,
-            'アジア州':`
+                'アジア州':`
 ヒマラヤ山脈(ひまらやさんみゃく)
 稲作(いなさく)
 季節風(きせつふう)
@@ -233,7 +229,7 @@ OPEC(おぺっく)
 メッカ(めっか)
 レアメタル(れあめたる)
 人工知能(じんこうちのう)`,
-            'ヨーロッパ州': `
+                'ヨーロッパ州': `
 暖流(だんりゅう)
 北大西洋海流(きたたいせいようかいりゅう)
 偏西風(へんせいふう)
@@ -267,9 +263,9 @@ EU(いーゆー)
 植民地(しょくみんち)
 公用語(こうようご)
 移民(いみん)`
-        },
-        '歴史モード': {
-            '世界の古代文明と宗教のおこり': `
+            },
+            '歴史モード': {
+                '世界の古代文明と宗教のおこり': `
 猿人(えんじん)
 氷河時代(ひょうがじだい)
 打製石器(だせいせっき)
@@ -327,7 +323,7 @@ EU(いーゆー)
 ムハンマド(むはんまど)
 イスラーム(いすらーむ)
 エルサレム(えるされむ)`,
-            '日本列島の誕生と大陸との交流': `
+                '日本列島の誕生と大陸との交流': `
 岩宿遺跡(いわじゅくいせき)
 黒曜石(こくようせき)
 縄文土器(じょうもんどき)
@@ -369,11 +365,11 @@ EU(いーゆー)
 「宋書」倭国伝(「そうしょ」わこくでん)
 渡来人(とらいじん)
 須恵器(すえき)`
-        }
-    },
-    'クイズモード': {
-        '地理クイズ': {
-            '世界と日本の姿': `
+            }
+        },
+        'クイズモード': {
+            '地理クイズ': {
+                '世界と日本の姿': `
 世界の大州の１つ。ユーラシア大陸のヨーロッパ以外の地域の州(アジア州)
 六大州の１つ。地中海を挟んでヨーロッパの南に位置する。赤道を挟んで南北双方に広い面積をもつ唯一の大陸。(アフリカ州)
 六大陸の１つ。スエズ地峡の西側の部分を占める大陸。(アフリカ大陸)
@@ -418,7 +414,7 @@ EU(いーゆー)
 ユーラシア大陸東端の沿岸沖、東アジアに位置、また太平洋北西の沿海部に位置する弧状列島の一つ。(日本列島)
 領海の基線からその外側２００海里の線までの海域とその海底及びその下。(排他的経済水域)
 南ヨーロッパに位置する国家で、その領域はローマ市内にある。国土面積は世界最小。(バチカン市国)
-北極圏の北緯66.6度より北で、夏至の期間、全く太陽が沈まず夜でも完全に暗くならい現象のこと.(白夜)
+北極圏の北緯66.6度より北で、夏至の期間、全く太陽が昇らず夜でも完全に暗くならい現象のこと。(白夜)
 世界の基準になる時刻のこと。(標準時)
 別名は本初子午線。国や地域の時刻の基準となる子午線のこと。(標準時子午線)
 択捉島、国後島、色丹島、歯舞群島のこと。ロシアに不法に占拠されている。(北方領土)
@@ -440,7 +436,7 @@ EU(いーゆー)
 国家が領有する陸地のこと。(領土)
 ユーラシア、アフリカ、北アメリカ、南アメリカ、南極、オーストラリアの６つの大陸のこと。(六大陸)
 ユーラシア大陸北部に位置する連邦共和制国家。面積世界１位。首都はモスクワ。(ロシア連邦)`,
-            '世界各地の人々の生活と環境': `
+                '世界各地の人々の生活と環境': `
 北半球の北極に近い地域でほぼ一年中氷や雪に覆われた気候帯。(寒帯)
 主に北米地域にすむシカ科に属する哺乳動物でトナカイのこと。(カリブー)
 カナダ北部などの氷雪地帯に住む先住民族。(イヌイット)
@@ -490,7 +486,7 @@ EU(いーゆー)
 インドで主に信仰されている宗教。牛は神の使いから牛肉は食べない。(ヒンドゥー教)
 唯一絶対の神ヤハウェを信仰するユダヤ人の民族宗教のこと。(ユダヤ教)
 イスラム教を信仰する人のこと。(ムスリム)`,
-            'アジア州':`
+                'アジア州':`
 高い標高とアジア大陸の中央に位置していることから「世界の屋根」とよばれる。（ヒマラヤ山脈）
 イネ（稲）を栽培して米を収穫すること。(稲作)
 日本では夏は南東の方向から、冬は北西の方向から吹く漢字３文字の風のこと。 (季節風)
@@ -529,8 +525,8 @@ EU(いーゆー)
 イスラム教の聖地。サウジアラビアにある。(メッカ)
 生産量が少なく、技術的・経済的に重要な金属のこと。(レアメタル)
 コンピュータが人間の知的能力を模倣して学習や推論、判断などを行う技術のこと。アルファベットで答えなさい。(AI)`,
-            'ヨーロッパ州': `
-温かい海水の流れ。寒い地域に暖かさをもたらす.(暖流)
+                'ヨーロッパ州': `
+温かい海水の流れ。寒い地域に暖かさをもたらす。(暖流)
 メキシコ湾流が大西洋を横断し、ヨーロッパに暖かさを運ぶ海流。(北大西洋海流)
 中緯度地域で西から東へ吹く風。天候に大きな影響を与える。(偏西風)
 氷河が削った谷に海水が入り込んでできた細長い入り江。(フィヨルド)
@@ -540,7 +536,7 @@ EU(いーゆー)
 英語やドイツ語など、ヨーロッパ北部で話される言語グループ。(ゲルマン系言語)
 フランス語やスペイン語など、ローマ帝国の影響を受けた言語グループ。(ラテン系言語)
 ロシア語やポーランド語など、東ヨーロッパで話される言語グループ。(スラブ系言語)
-EU加盟国の多くで使われている共通通貨。(ユーロ)
+ユーロ(ゆーろ)
 フランス語のvacancesのこと。本来は、長期休暇の過ごし方や長期休暇そのもの。(バカンス)
 EUの前身。経済統合を目指した組織。アルファベット２文字。(EC)
 英仏海峡トンネルを通る高速鉄道。ロンドンとパリを結ぶ。(ユーロスター)
@@ -562,67 +558,67 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 強い国が弱い国や地域を支配し、資源や労働力を利用した場所。(植民地)
 国が公的に使うと決めた言語。書類や教育で使われる。(公用語)
 本来の居住地を離れて移動する人のこと。(移民)`
-        },
-        '歴史クイズ': {
-            '世界の古代文明と宗教のおこり': `
-約７００万年から６００万年前にアフリカに出現した、現在知られている最古の人類。(猿人)
-およそ２６０万年前、地球の気温が低く、厚い氷におおわれていた時代のこと。　(氷河時代)
-石を打ち欠いてつくった石器のこと。(打製石器)
-今から２００万年ほど前に出現した人類で、かなり進化していて、打製石器や火を使用していたことが分かっている。(原人)
-２０万年ほど前に出現した人類で、現在の人類の直接の祖先と考えられている。(新人)
-約４万年から１万年前にヨーロッパに分布していた人類でラスコー洞窟、アルタミラ洞窟の壁画で知られる。(クロマニョン人)
-人類が打製石器を使い、狩りや採集、漁で生活をしていた時代。(旧石器時代)
-群馬県の遺跡。相沢忠洋が黒曜石の打製石器を発見し、日本にも旧石器時代のあったことが確かめられた。(岩宿遺跡)
-粘土を焼いてつくった容器。新石器時代からつくられはじめたもの。(土器)
-石の表面をみがいてつくった石器のこと。(磨製石器)
-石器と土器が使われ、農耕と牧畜がはじまった時代。(新石器時代)
-田畑を耕して作物をつくることで、世界的には新石器時代のころにはじまった。(農耕)
-牛、馬、豚、羊などの家畜を飼育し、その数をふやすこと。(牧畜)
-おもに古代につくられた金属器。青銅は銅とすずを混ぜ合わせてできるかたい金属。(青銅器)
-鉄製の道具。かたくて熱に強いという利点がある。(鉄器)
-人間が作り出した高度な文化や社会のこと。(文明)
-ナイル川流域に発展した古代文明。(エジプト文明)
-太陽の動きにもとづく暦。(太陽暦)
-ものの形をかたどった文字で、パピルスという一種の紙に書かれた。(象形文字)
-今のイラク付近のチグリス川とユーフラテス川のほとりに生まれた文明(メソポタミア文明)
-古代メソポタミアの文字。粘土板に葦の茎のペンを使って刻みこんだもの。(くさび形文字)
-月の満ち欠けにもとづく暦。(太陰暦)
-現在でも１時間＝６０分、１分＝６０秒のように用いられている。(60進法)
-1週7日制。 7日を単位として生活習慣のサイクルとする暦法。(七曜制)
-ヨーロッパから見て東方の地域のこと。(オリエント)
-紀元前1792年から1750年にバビロニアを統治したハンムラビ王が発布した法典。(ハンムラビ法典)
-今のパキスタンの付近にあるインダス川流域で生まれた文明。都市遺跡のモヘンジョ・ダロが有名(インダス文明)
-インダス文明最大級の都市遺跡。1980年世界遺産(モヘンジョ・ダロ)
-インドで行われている身分制度。ヒンドゥー教と結びついた制度。(カースト制)
-黄河の中・下流域と長江の下流域で稲を栽培した農耕文明(中国文明)
-紀元前１６世紀？〜紀元前１１世紀頃？　実在が確認されている中国の最古の王朝。(殷)
-亀の甲や牛の骨に刻まれた文字。占いに使われたもので、漢字のもとになっている。(甲骨文字)
-紀元前770年に周が都を移してから、紀元前221年に秦が中国を統一するまでの時代。(春秋・戦国時代)
-紀元前５５２年〜紀元前４７９年　古代中国の思想家。(孔子)
-古代中国の思想家孔子が主張した政治道徳思想の学問のこと。(儒学)
-紀元前７７８年〜紀元前２０６年　中国の最初の統一王朝。　(秦)
-紀元前２５９年〜紀元前２１０年　秦の初代皇帝。(始皇帝)
-中国で、北方の遊牧民族の侵入を防ぐために築かれた城壁のこと。世界遺産。(万里の長城)
-紀元前２０２年〜２２０年　秦に続く中国の統一王朝。　(漢)
-中央アジアを通って中国とヨーロッパを結びつけた、古代の交易路（カタカナ名）。(シルクロード)
-古代ギリシャに成立した都市国家。アテネ、スパルタ、コリントなどの都市国家が成立。(ポリス)
-人民が主権を持ち、人民の手で、人民のために政治が行われること。(民主政)
-古代ギリシャで発達した文明。パルテノン神殿が有名。他にはオリンピックもひらかれた。(ギリシャ文明)
-紀元前３５６年〜紀元前３２３年　東方遠征によって大帝国を建設した王（ギリシャ北方のマケドニアの王）(アレクサンドロス大王)
-古代ギリシア時代にギリシア神話の女神アテーナーを祀る神殿。(パルテノン神殿)
-ギリシャとオリエント（東方）の文化が結びついた文化のこと。ミロのビーナスなど有名。(ヘレニズム)
-国民が共同して政治を行うこと。一般に、君主のいない政治。(共和政)
-皇帝が国の政治を独自に行う政治体制のこと。(帝政)
-ローマ（イタリア）を首都とする古代の帝国。紀元前8世紀頃から王政→共和政→帝政と変化した。(ローマ帝国)
-紀元前４６３年？〜紀元前３８３年？　インドの元王子でインドの宗教家で、仏教を開いた。(シャカ)
-紀元前５世紀頃にインドでシャカが開いた宗教。日本には５３８年（５５２年とする説もある）に百済から伝わった。(仏教)
-ヤハウェを唯一神とし、聖書（旧約聖書）を経典とする宗教。(ユダヤ教)
-紀元前５年？〜紀元３０年？　元ユダヤ教徒でキリスト教を開いた人物。(イエス)
-紀元１世紀にイエスが開いた宗教。(キリスト教)
-アラビア半島のメッカに生まれ、商人として活動し、６１０年洞窟で神の啓示から預言者として活躍した。(ムハンマド)
-７世紀にムハンマドが開いた宗教。唯一神アラーを信仰する一神教で、コーランを聖典とする。酒を飲まず、豚肉を食べない。(イスラーム)
-イスラエルにある都市。エルサレムは世界最古の都市の一つであり、ユダヤ教、キリスト教、イスラム教の聖地。(エルサレム)`,
-            '日本列島の誕生と大陸との交流': `
+            },
+            '歴史モード': {
+                '世界の古代文明と宗教のおこり': `
+猿人(えんじん)
+氷河時代(ひょうがじだい)
+打製石器(だせいせっき)
+原人(げんじん)
+新人(しんじん)
+クロマニョン人(くろまにょんじん)
+旧石器時代(きゅうせっきじだい)
+岩宿遺跡(いわじゅくいせき)
+土器(どき)
+磨製石器(ませいせっき)
+新石器時代(しんせっきじだい)
+農耕(のうこう)
+牧畜(ぼくちく)
+青銅器(せいどうき)
+鉄器(てっき)
+文明(ぶんめい)
+エジプト文明(えじぷとぶんめい)
+太陽暦(たいようれき)
+象形文字(しょうけいもじ)
+メソポタミア文明(めそぽたみあぶんめい)
+くさび形文字(くさびがたもじ)
+太陰暦(たいいんれき)
+60進法(60しんほう)
+七曜制(しちようせい)
+オリエント(おりえんと)
+ハンムラビ法典(はんむらびほうてん)
+インダス文明(いんだすぶんめい)
+モヘンジョ・ダロ(もへんじょ・だろ)
+カースト制(かーすとせい)
+中国文明(ちゅうごくぶんめい)
+殷(いん)
+甲骨文字(こうこつもじ)
+春秋・戦国時代(しゅんじゅう・せんごくじだい)
+孔子(こうし)
+儒学(じゅがく)
+秦(しん)
+始皇帝(しこうてい)
+万里の長城(ばんりのちょうじょう)
+漢(かん)
+シルクロード(しるくろーど)
+ポリス(ぽりす)
+民主政(みんしゅせい)
+ギリシャ文明(ぎりしゃぶんめい)
+アレクサンドロス大王(あれくさんどろすだいおう)
+パルテノン神殿(ぱるてのんしんでん)
+ヘレニズム(へれにずむ)
+共和政(きょうわせい)
+帝政(ていせい)
+ローマ帝国(ろーまていこく)
+シャカ(しゃか)
+仏教(ぶっきょう)
+ユダヤ教(ゆだやきょう)
+イエス(いえす)
+キリスト教(きりすときょう)
+ムハンマド(むはんまど)
+イスラーム(いすらーむ)
+エルサレム(えるされむ)`,
+                '日本列島の誕生と大陸との交流': `
 岩宿遺跡(いわじゅくいせき)
 黒曜石(こくようせき)
 縄文土器(じょうもんどき)
@@ -664,9 +660,9 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
 「宋書」倭国伝(「そうしょ」わこくでん)
 渡来人(とらいじん)
 須恵器(すえき)`
+            }
         }
-    }
-};
+    };
 
     function loadTopics() {
         const { topicList, messageElement } = getGameElements();
@@ -769,7 +765,6 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             resetGame();
         } else {
             console.error('Selected topic not found or is not a string:', topicName);
-            // Handle cases where a category is clicked, not a topic
             if (currentMode === 'タイピングモード') {
                 currentTypingCategory = topicName;
             }
@@ -783,7 +778,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             const match = line.match(/(.*)(?:（|\()([^）)]+)(?:）|\))$/);
             if (match) {
                 const display = match[1].trim();
-                const answer = (currentMode === 'タイピングモード') ? match[2].trim() : display;
+                const answer = match[2].trim();
                 return { display: display, answer: answer };
             }
             return null;
@@ -795,15 +790,18 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         console.log("resetGame function entered");
         const { inputElement, messageElement, backButton, scoreElement, timerElement, wpmElement, consecutiveCorrectElement, questionElement, modeSelectionDiv, wpmContainer, consecutiveContainer, easyModeButton, hardModeButton, startButton } = getGameElements();
 
-        if (inputElement) inputElement.disabled = true;
-        if (inputElement) inputElement.value = '';
+        if (inputElement) {
+            inputElement.disabled = true;
+            inputElement.value = '';
+            inputElement.classList.remove('is-invalid');
+        }
         if (messageElement) messageElement.className = 'alert alert-info mt-4';
         if (backButton) backButton.classList.add('hidden');
         score = 0;
         time = 60;
         totalTypedChars = 0;
         consecutiveCorrect = 0;
-        currentQuestionIndex = 0; // Reset question index
+        currentQuestionIndex = 0;
         if (scoreElement) scoreElement.textContent = score;
         if (timerElement) timerElement.textContent = time;
         if (wpmElement) wpmElement.textContent = 0;
@@ -827,7 +825,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             if (messageElement) messageElement.textContent = '難易度を選択してください';
         }
         console.log("ゲームのリセット完了");
-        attachGameEventListeners(); // Attach listeners here
+        attachGameEventListeners();
     }
 
     function attachGameEventListeners() {
@@ -872,7 +870,6 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     function startGame(hardMode) {
         isHardMode = hardMode;
         console.log(`ゲーム開始！ ハードモード: ${isHardMode}`);
-        console.log("シャッフル前の問題:", questions.map(q => q.display));
         const { inputElement, messageElement, startButton, backButton, modeSelectionDiv, scoreElement, timerElement, wpmElement, consecutiveCorrectElement } = getGameElements();
 
         if (questions.length === 0) {
@@ -887,8 +884,8 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
                 const j = Math.floor(Math.random() * (i + 1));
                 [questions[i], questions[j]] = [questions[j], questions[i]];
             }
-            console.log("シャッフル後の問題:", questions.map(q => q.display));
         }
+        console.log("シャッフル後の問題:", questions.map(q => q.display));
 
         if (inputElement) {
             inputElement.disabled = false;
@@ -919,19 +916,24 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         const { questionElement, inputElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) {
             if (isHardMode) {
-                // Hard mode: Reshuffle and reset index
                 for (let i = questions.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [questions[i], questions[j]] = [questions[j], questions[i]];
                 }
                 console.log("問題を再シャッフルしました。");
             }
-            // Reset index for both modes to loop
             currentQuestionIndex = 0;
             console.log("問題が尽きたため、最初に戻ります。");
         }
-        if (questionElement) questionElement.textContent = questions[currentQuestionIndex].display;
-        if (inputElement) inputElement.value = '';
+        if (questionElement) {
+            questionElement.textContent = questions[currentQuestionIndex].display;
+            questionElement.classList.remove('incorrect');
+        }
+        if (inputElement) {
+            inputElement.value = '';
+            inputElement.classList.remove('is-invalid');
+            inputElement.focus();
+        }
     }
 
     function startTimer() {
@@ -965,43 +967,28 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     }
 
     function checkTypingInput() {
-        const { inputElement, scoreElement, questionElement } = getGameElements();
+        const { inputElement, scoreElement } = getGameElements();
         if (currentQuestionIndex >= questions.length) return;
+
         const currentQuestion = questions[currentQuestionIndex];
         const inputText = inputElement ? inputElement.value : '';
         const answer = currentQuestion.answer;
 
-        let html = '';
-        let allCorrect = true;
-        for (let i = 0; i < answer.length; i++) {
-            if (i < inputText.length) {
-                if (inputText[i] === answer[i]) {
-                    html += `<span class="correct">${answer[i]}</span>`;
-                } else {
-                    html += `<span class="incorrect">${answer[i]}</span>`;
-                    allCorrect = false;
-                }
-            } else {
-                html += `<span>${answer[i]}</span>`;
-                allCorrect = false;
-            }
-        }
-        questionElement.innerHTML = html;
-
-        if (allCorrect) {
+        if (inputText === answer) {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => {});
             score++;
             totalTypedChars += answer.length;
             if (scoreElement) scoreElement.textContent = score;
+            
             currentQuestionIndex++;
-            setTimeout(() => {
-                setNextQuestion();
-                if (inputElement) {
-                    inputElement.value = '';
-                    inputElement.focus();
-                }
-            }, 100);
+            setNextQuestion();
+        } else {
+            if (answer.startsWith(inputText)) {
+                inputElement.classList.remove('is-invalid');
+            } else {
+                inputElement.classList.add('is-invalid');
+            }
         }
     }
 
@@ -1019,8 +1006,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
             if (scoreElement) scoreElement.textContent = score;
             if (consecutiveCorrectElement) consecutiveCorrectElement.textContent = consecutiveCorrect;
             currentQuestionIndex++;
-            if (inputElement) inputElement.value = '';
-            setTimeout(setNextQuestion, 100);
+            setNextQuestion();
         } else {
             incorrectSound.currentTime = 0;
             incorrectSound.play().catch(e => {});
@@ -1036,7 +1022,10 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
     function endGame() {
         const { inputElement, messageElement, wpmElement, backButton, modeSelectionDiv } = getGameElements();
         stopTimer();
-        if (inputElement) inputElement.disabled = true;
+        if (inputElement) {
+            inputElement.disabled = true;
+            inputElement.classList.remove('is-invalid');
+        }
         let endMessage = `ゲーム終了！ スコア: ${score}`;
         if (currentMode === 'タイピングモード') {
             const finalWPM = wpmElement ? wpmElement.textContent : '0';
@@ -1065,9 +1054,9 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
                     }
                 } else if (currentTypingCategory === '歴史モード') {
                     if (isHardMode) {
-                        wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg']; // You can change this to history specific wallpapers
+                        wallpapers = ['wallpapers/typing_hard/typing_hard_01.jpg', 'wallpapers/typing_hard/typing_hard_02.jpg'];
                     } else {
-                        wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg']; // You can change this to history specific wallpapers
+                        wallpapers = ['wallpapers/typing_easy/typing_easy_01.jpg', 'wallpapers/typing_easy/typing_easy_02.jpg'];
                     }
                 }
             }
@@ -1102,7 +1091,6 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         const filenameWithoutExt = lastDotIndex > -1 ? filename.substring(0, lastDotIndex) : filename;
         downloadLink.download = filenameWithoutExt + '.jpg';
         
-        // Use Bootstrap's modal function
         $(wallpaperModal).modal('show');
     }
 

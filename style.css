@@ -32,24 +32,10 @@ body {
 
 .incorrect {
     color: lightcoral;
-    '''    text-decoration: underline;
+    text-decoration: underline;
 }
 
-#question span {
-    font-size: 2rem; /* Adjust as needed */
-    padding: 2px;
-    border-radius: 3px;
-}
-
-#question span.correct {
-    background-color: rgba(0, 255, 0, 0.3);
-}
-
-#question span.incorrect {
-    background-color: rgba(255, 0, 0, 0.3);
-}
-
-#message {'''
+#message {
     font-size: 1.1rem;
 }
 
@@ -126,6 +112,21 @@ body {
 
 .modal-body p {
     color: white;
+}
+
+/* New styles for typing input feedback */
+#question span {
+    font-size: 2rem; /* Adjust as needed */
+    padding: 2px;
+    border-radius: 3px;
+}
+
+#question span.correct {
+    background-color: rgba(0, 255, 0, 0.3);
+}
+
+#question span.incorrect {
+    background-color: rgba(255, 0, 0, 0.3);
 }
 
 /* Responsive Design */
