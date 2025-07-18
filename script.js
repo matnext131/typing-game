@@ -1206,9 +1206,39 @@ B.C.（紀元前）1世紀ごろに中国の国「漢」が、日本の国「倭
         if (modeSelectionDiv) modeSelectionDiv.classList.add('hidden');
     }
 
-    // --- Event Listeners ---
-    passwordSubmit.addEventListener('click', checkPassword);
-    passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkPassword();
-    });
+// --- Event Listeners ---
+// 修正箇所：ボタンがクリックされたことをコンソールに表示する
+passwordSubmit.addEventListener('click', () => {
+    console.log('「入室」ボタンがクリックされました。');
+    checkPassword();
 });
+
+passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        console.log('Enterキーが押されました。');
+        checkPassword();
+    }
+});
+
+// 修正箇所：入力された値と正解をコンソールに表示する
+function checkPassword() {
+    // これらの要素がHTML内に存在するかを最初に確認します
+    if (!passwordInput) {
+        console.error('エラー：password-input要素が見つかりません。');
+        return;
+    }
+
+    console.log('入力された値:', passwordInput.value);
+    console.log('正解のパスワード:', CORRECT_PASSWORD);
+
+    if (passwordInput.value === CORRECT_PASSWORD) {
+        console.log('パスワードが一致しました！');
+        passwordScreen.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        loadTopics();
+    } else {
+        console.log('パスワードが一致しませんでした。');
+        passwordMessage.textContent = 'パスワードが間違っています。';
+        passwordMessage.classList.remove('hidden');
+    }
+}
