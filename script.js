@@ -780,7 +780,7 @@ EUの前身。経済統合を目指した組織。アルファベット２文字
         questions = text.split('\n').filter(line => line.trim() !== '').map(line => {
             const match = line.match(/(.*)(?:（|\()([^）)]+)(?:）|\))$/);
             if (match) {
-                const answer = (currentMode === 'タイピングモード') ? match[1].trim() : match[2].trim();
+                const answer = (currentMode === 'タイピングモード') ? match[2].trim() : match[1].trim();
                 return { display: match[1].trim(), answer: answer };
             }
             return null;
