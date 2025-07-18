@@ -1,6 +1,3 @@
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // Sound elements
     const correctSound = document.getElementById('correct-sound');
@@ -226,7 +223,7 @@ ASEAN(あせあん)
 ICT産業(あいしーてぃーさんぎょう)
 コーラン(こーらん)
 食料自給率(しょくりょうじきゅうりつ)
-石油輸出国機構(せきゆゆしゅしゅつこくきこう)
+石油輸出国機構(sekiyuyushutsukokukikou)
 OPEC(おぺっく)
 乾燥帯(かんそうたい)
 メッカ(めっか)
@@ -259,7 +256,7 @@ EU(いーゆー)
 エコツーリズム(えこつーりずむ)
 オーバーツーリズム(おーばーつーりずむ)
 パークアンドライド(ぱーくあんどらいど)
-経済格差(けいざいかくさ)
+経済格差(keizaikakusa)
 国民総所得(こくみんそうしょとく)
 ハイテク産業(はいてくさんぎょう)
 外国人労働者(がいこくじんろうどうしゃ)
@@ -414,13 +411,13 @@ EU(いーゆー)
 日本の地方公共団体である「都」「道」「府」「県」の総称。(都道府県)
 陸地に囲まれて海に面していない国のこと。(内陸国)
 六大陸の１つ。ほとんどが氷におおわれていて、人間は定住していない。(南極大陸)
-ユーラシア大陸東端の沿岸沖、東アジアに位置、また太平洋北西の沿海部に位置する弧状列島の一つ。(日本列島)
+ユーラシア大陸東端の沿岸沖、東アジアに位置、また太平洋北西の沿海部に位置する弧状列島の一つ.(日本列島)
 領海の基線からその外側２００海里の線までの海域とその海底及びその下。(排他的経済水域)
 南ヨーロッパに位置する国家で、その領域はローマ市内にある。国土面積は世界最小。(バチカン市国)
 北極圏の北緯66.6度より北で、夏至の期間、全く太陽が沈まず夜でも完全に暗くならい現象のこと。(白夜)
 世界の基準になる時刻のこと。(標準時)
 別名は本初子午線。国や地域の時刻の基準となる子午線のこと。(標準時子午線)
-択捉島、国後島、色丹島、歯舞群島のこと。ロシアに不法に占拠されている。(北方領土)
+択捉島(えとろふとう)、国後島(くなしりとう)、色丹島(しこたんとう)、歯舞群島(はぼまいぐんとう)のこと。ロシアに不法に占拠されている。(北方領土)
 経度0度の基準となる経線。世界標準時の基準でイギリスのロンドンを通る。(本初子午線)
 六大州の一つ。全体が西半球にあり、大部分が南半球にある。国の数は、12 カ国である。(南アメリカ州)
 六大陸の１つ。パナマ地峡より南側の部分のこと。(南アメリカ大陸)
@@ -478,7 +475,7 @@ EU(いーゆー)
 短い夏に雪や氷が解けて、わずかに草やこけが生える地域の気候名。(ツンドラ気候)
 一年を通して雨がとても少ない地域の気候名。(砂漠気候)
 わずかに雨が降る季節があることから、わずかに樹木をふくんだ、たけの短い草原が広がる地域の気候名。(ステップ気候)
-一年中雨が降り、うっそうとした森林が広がる地域の気候名。(熱帯雨林気候)
+一年中雨が降り、うっそうとした森林が広がる地域の気候名.(熱帯雨林気候)
 乾季と雨季とがはっきりしていてまばらな樹木とたけの長い草原が広がる地域の気候名。(サバナ気候)
 釈迦が広めた宗教。教典は「経」。(仏教)
 誰でも成仏できる、誰でも悟りを開くことができると教えられている仏教(大乗仏教)
@@ -490,8 +487,8 @@ EU(いーゆー)
 唯一絶対の神ヤハウェを信仰するユダヤ人の民族宗教のこと。(ユダヤ教)
 イスラム教を信仰する人のこと。(ムスリム)`,
                 'アジア州':`
-高い標高とアジア大陸の中央に位置していることから「世界の屋根」とよばれる。（ヒマラヤ山脈）
-イネ（稲）を栽培して米を収穫すること。(稲作)
+ヒマラヤ山脈(ひまらやさんみゃく)
+稲作(いなさく)
 季節風(きせつふう)
 雨季(うき)
 乾季(かんき)
@@ -558,7 +555,7 @@ EU(いーゆー)
 オーバーツーリズム(おーばーつーりずむ)
 パークアンドライド(ぱーくあんどらいど)
 経済格差(keizaikakusa)
-国民総所得(こくみんそうしょとく)
+国民総所得(koくみんそうしょとく)
 ハイテク産業(はいてくさんぎょう)
 外国人労働者(がいこくじんろうどうしゃ)
 植民地(しょくみんち)
@@ -929,7 +926,7 @@ EU(いーゆー)
                 console.log("問題を再シャッフルしました。");
             }
             currentQuestionIndex = 0;
-            console.log("問題が尽きたため、最初に戻ります.\n");
+            console.log("問題が尽きたため、最初に戻ります。\n");
         }
         if (questionElement) {
             questionElement.textContent = questions[currentQuestionIndex].display;
@@ -983,22 +980,24 @@ EU(いーゆー)
         const answer = currentQuestion.answer;
 
         // Visual feedback for current question
-        let html = '';
-        let allCorrect = true;
-        for (let i = 0; i < answer.length; i++) {
-            if (i < inputText.length) {
-                if (inputText[i] === answer[i]) {
-                    html += `<span class="correct">${answer[i]}</span>`;
-                } else {
-                    html += `<span class="incorrect">${answer[i]}</span>`;
-                    allCorrect = false;
-                }
-            } else {
-                html += `<span>${answer[i]}</span>`;
-                allCorrect = false;
-            }
-        }
-        questionElement.innerHTML = html;
+        // This part was causing the question display to be overwritten.
+        // We will remove it and rely on input field styling.
+        // let html = '';
+        // let allCorrect = true;
+        // for (let i = 0; i < answer.length; i++) {
+        //     if (i < inputText.length) {
+        //         if (inputText[i] === answer[i]) {
+        //             html += `<span class="correct">${answer[i]}</span>`;
+        //         } else {
+        //             html += `<span class="incorrect">${answer[i]}</span>`;
+        //             allCorrect = false;
+        //         }
+        //     } else {
+        //         html += `<span>${answer[i]}</span>`;
+        //         allCorrect = false;
+        //     }
+        // }
+        // questionElement.innerHTML = html;
 
         if (inputText === answer) {
             correctSound.currentTime = 0;
