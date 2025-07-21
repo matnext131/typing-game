@@ -915,15 +915,15 @@ EU(EU)
             if (score >= threshold) {
                 if (currentTypingCategory === '地理モード') {
                     if (isHardMode) {
-                        wallpapers = ['/wallpapers/typing_hard/typing_hard_01.jpg', '/wallpapers/typing_hard/typing_hard_02.jpg'];
+                        wallpapers = ['./wallpapers/typing_hard/typing_hard_01.jpg', './wallpapers/typing_hard/typing_hard_02.jpg'];
                     } else {
-                        wallpapers = ['/wallpapers/typing_easy/typing_easy_01.jpg', '/wallpapers/typing_easy/typing_easy_02.jpg'];
+                        wallpapers = ['./wallpapers/typing_easy/typing_easy_01.jpg', './wallpapers/typing_easy/typing_easy_02.jpg'];
                     }
                 } else if (currentTypingCategory === '歴史モード') {
                     if (isHardMode) {
-                        wallpapers = ['/wallpapers/typing_hard/typing_hard_01.jpg', '/wallpapers/typing_hard/typing_hard_02.jpg'];
+                        wallpapers = ['./wallpapers/typing_hard/typing_hard_01.jpg', './wallpapers/typing_hard/typing_hard_02.jpg'];
                     } else {
-                        wallpapers = ['/wallpapers/typing_easy/typing_easy_01.jpg', '/wallpapers/typing_easy/typing_easy_02.jpg'];
+                        wallpapers = ['./wallpapers/typing_easy/typing_easy_01.jpg', './wallpapers/typing_easy/typing_easy_02.jpg'];
                     }
                 }
             }
@@ -931,9 +931,9 @@ EU(EU)
             const threshold = isHardMode ? hardThreshold : easyThreshold;
             if (consecutiveCorrect >= threshold) {
                 if (isHardMode) {
-                    wallpapers = ['/wallpapers/quiz_hard/quiz_hard_01.jpg', '/wallpapers/quiz_hard/quiz_hard_02.jpg'];
+                    wallpapers = ['./wallpapers/quiz_hard/quiz_hard_01.jpg', './wallpapers/quiz_hard/quiz_hard_02.jpg'];
                 } else {
-                    wallpapers = ['/wallpapers/quiz_easy/quiz_easy_01.jpg', '/wallpapers/quiz_easy/quiz_easy_02.jpg'];
+                    wallpapers = ['./wallpapers/quiz_easy/quiz_easy_01.jpg', './wallpapers/quiz_easy/quiz_easy_02.jpg'];
                 }
             }
         }
