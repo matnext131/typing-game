@@ -1,177 +1,326 @@
+/* =============================================
+   ベース
+============================================= */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: white; /* Change text color to be visible on the dark background */
-    background-color: #000; /* Fallback color */
-    font-family: 'Noto Sans JP', 'M PLUS Rounded 1c', sans-serif;
+  margin: 0;
+  padding: 16px;
+  min-height: 100vh;
+  background: #1a237e;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: #fff;
 }
 
-.container {
-    max-width: 800px;
-    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background to the container */
-    padding: 20px;
-    border-radius: 10px;
-}
-
-.card {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    background-color: rgba(255, 255, 255, 0.1); /* Make card background semi-transparent */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-#question {
-    /* font-family: 'Meiryo', sans-serif; */
-}
-
-.correct {
-    color: lightgreen;
-}
-
-.incorrect {
-    color: lightcoral;
-    text-decoration: underline;
-}
-
-#message {
-    font-size: 1.1rem;
-}
-
-#start-button {
-    transition: all 0.3s ease;
-}
-
-#start-button:hover {
-    transform: scale(1.05);
+.screen {
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .hidden {
-    display: none;
+  display: none !important;
 }
 
-.topic-button {
-    cursor: pointer;
+/* =============================================
+   カード
+============================================= */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 28px 24px;
 }
 
-.topic-button:hover {
-    background-color: #f8f9fa;
+h1 {
+  font-size: 1.8rem;
+  margin: 0 0 8px;
+  text-align: center;
 }
 
-.game-stats {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
+h2 {
+  font-size: 1.5rem;
+  margin: 0 0 20px;
+  text-align: center;
 }
 
-.game-stats h4 {
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+h3 {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
 }
 
-.game-stats p {
-    margin-bottom: 0;
-    font-size: 2rem;
-    font-weight: bold;
+.subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 20px;
 }
 
-#password-screen .card {
-    max-width: 500px;
-    margin: 50px auto;
+/* =============================================
+   ボタン共通（iPad タップしやすいサイズ）
+============================================= */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 18px 16px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  line-height: 1.4;
 }
 
-#password-message {
-    min-height: 24px;
+.btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
 }
 
-#mode-selection button {
-    font-size: 1.2rem;
-    padding: 10px 20px;
+.btn:disabled {
+  cursor: default;
 }
 
-#back-to-selection {
-    background-color: #6c757d;
-    border-color: #6c757d;
+.btn-primary {
+  background: #3f51b5;
+  color: #fff;
 }
 
-#back-to-selection:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+.btn-primary:hover:not(:disabled) {
+  background: #5c6bc0;
 }
 
-.modal-content {
-    background-color: #343a40;
-    color: white;
+.btn-secondary {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
 }
 
-.modal-header .close {
-    color: white;
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255,255,255,0.25);
 }
 
-.modal-body p {
-    color: white;
+.btn-topic {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  text-align: left;
+  border: 1px solid rgba(255,255,255,0.25);
 }
 
-/* New styles for typing input feedback */
-#question span {
-    font-size: 2rem; /* Adjust as needed */
-    padding: 2px;
-    border-radius: 3px;
+.btn-topic:hover {
+  background: rgba(255,255,255,0.2);
 }
 
-#question span.correct {
-    background-color: rgba(0, 255, 0, 0.3);
+.btn-warning {
+  border-color: #ffc107;
+  color: #ffc107;
 }
 
-#question span.incorrect {
-    background-color: rgba(255, 0, 0, 0.3);
+/* =============================================
+   テキスト入力（パスワード画面）
+============================================= */
+.text-input {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 1.2rem;
+  font-family: inherit;
+  outline: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    .game-stats {
-        flex-direction: column;
-    }
-
-    .game-stats > div {
-        margin-bottom: 1rem;
-    }
-
-    #mode-selection button {
-        display: block;
-        width: 100%;
-        margin-bottom: 10px;
-    }
+.text-input:focus {
+  border-color: #90caf9;
 }
 
-@media (max-width: 576px) {
-    .card-body {
-        padding: 15px;
-    }
+.error-msg {
+  color: #ef9a9a;
+  text-align: center;
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
 
-    #question {
-        font-size: 1.5rem;
-    }
+/* =============================================
+   クイズ画面
+============================================= */
+#quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.7);
+}
 
-    #input {
-        font-size: 1.2rem;
-    }
+#question-box {
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .game-stats h4 {
-        font-size: 1rem;
-    }
+#question-text {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin: 0;
+  text-align: center;
+}
 
-    .game-stats p {
-        font-size: 1.5rem;
-    }
+/* 選択肢ボタン */
+.btn-choice {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 20px 16px;
+}
+
+.btn-choice:not(:disabled):hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.choice-correct {
+  background: rgba(76, 175, 80, 0.4) !important;
+  border-color: #66bb6a !important;
+}
+
+.choice-wrong {
+  background: rgba(244, 67, 54, 0.4) !important;
+  border-color: #ef5350 !important;
+}
+
+/* フィードバック */
+#feedback {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.feedback-correct {
+  font-size: 1.3rem;
+  color: #a5d6a7;
+  margin: 0 0 8px;
+}
+
+.feedback-wrong {
+  font-size: 1.3rem;
+  color: #ef9a9a;
+  margin: 0 0 8px;
+}
+
+#feedback-answer {
+  font-size: 1rem;
+  color: #fff;
+  margin: 0 0 12px;
+}
+
+#btn-next {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* =============================================
+   結果画面
+============================================= */
+#result-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px 8px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+#result-mistakes {
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+#mistakes-list {
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
+}
+
+#mistakes-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#mistakes-list li:last-child {
+  border-bottom: none;
+}
+
+.mistake-desc {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.65);
+}
+
+/* =============================================
+   iPad / レスポンシブ
+============================================= */
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  #question-text {
+    font-size: 1.05rem;
+  }
+
+  .btn-choice {
+    font-size: 1.1rem;
+    padding: 18px 12px;
+  }
+
+  #result-stats {
+    gap: 8px;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
 }
