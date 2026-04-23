@@ -2,10 +2,14 @@
 const USE_PASSWORD = false;
 const APP_PASSWORD = "shakai131";
 
+// ランダム問題の出題数
+const RANDOM_QUIZ_COUNT = 50;
+
 // =============================================
 // 状態管理
 // =============================================
 let currentTopic = null;
+let isRandomMode = false;
 let quizQuestions = [];
 let currentIndex = 0;
 let correctCount = 0;
@@ -39,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-retry').addEventListener('click', () => {
-    startQuiz(currentTopic);
+    if (isRandomMode) startRandomQuiz();
+    else startQuiz(currentTopic);
   });
 });
 
@@ -76,12 +81,53 @@ function buildTopicList() {
     btn.addEventListener('click', () => startQuiz(i));
     list.appendChild(btn);
   });
+
+  // ランダム問題ボタン（一番下に追加）
+  const allTerms = topics.flatMap(t => t.terms);
+  const separator = document.createElement('hr');
+  separator.style.borderColor = 'rgba(255,255,255,0.2)';
+  separator.style.margin = '8px 0';
+  list.appendChild(separator);
+
+  const randomBtn = document.createElement('button');
+  randomBtn.className = 'btn btn-random';
+  randomBtn.innerHTML = '🎲 ランダム問題（全単元から' + RANDOM_QUIZ_COUNT + '問）';
+  randomBtn.addEventListener('click', startRandomQuiz);
+  list.appendChild(randomBtn);
+}
+
+// =============================================
+// ランダムクイズ開始
+// =============================================
+function startRandomQuiz() {
+  isRandomMode = true;
+  currentTopic = null;
+
+  // 全単元の用語をまとめてシャッフル → 先頭N個を選ぶ
+  const allTerms = topics.flatMap(t => t.terms);
+  shuffle(allTerms);
+  const picked = allTerms.slice(0, RANDOM_QUIZ_COUNT);
+
+  // 選択肢は全用語プールから選ぶ
+  quizQuestions = picked.map(t => ({
+    correct: t,
+    choices: buildChoices(t, allTerms)
+  }));
+
+  currentIndex = 0;
+  correctCount = 0;
+  mistakes = [];
+
+  document.getElementById('quiz-topic-name').textContent = '🎲 ランダム問題';
+  showScreen('screen-quiz');
+  showQuestion();
 }
 
 // =============================================
 // クイズ開始
 // =============================================
 function startQuiz(topicIndex) {
+  isRandomMode = false;
   currentTopic = topicIndex;
   const topicObj = topics[topicIndex];
 

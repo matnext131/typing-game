@@ -118,6 +118,17 @@ h3 {
   color: #ffc107;
 }
 
+.btn-random {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffd54f;
+  border: 2px solid #ffc107;
+  font-size: 1.15rem;
+}
+
+.btn-random:hover {
+  background: rgba(255, 193, 7, 0.3);
+}
+
 /* =============================================
    テキスト入力（パスワード画面）
 ============================================= */
