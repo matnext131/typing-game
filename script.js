@@ -73,7 +73,7 @@ function buildTopicList() {
     btn.className = 'btn btn-topic';
     btn.textContent = topicObj.topic;
 
-    if (topicObj.terms.length < 4) {
+    if (uniqueByLabel(topicObj.terms).length < 4) {
       btn.textContent += ' ⚠ 用語が少ない';
       btn.classList.add('btn-warning');
     }
@@ -103,8 +103,8 @@ function startRandomQuiz() {
   isRandomMode = true;
   currentTopic = null;
 
-  // 全単元の用語をまとめてシャッフル → 先頭N個を選ぶ
-  const allTerms = topics.flatMap(t => t.terms);
+  // 全単元の用語をまとめてシャッフル → 先頭N個を選ぶ（同じ語句は1回だけ）
+  const allTerms = uniqueByLabel(topics.flatMap(t => t.terms));
   shuffle(allTerms);
   const picked = allTerms.slice(0, RANDOM_QUIZ_COUNT);
 
@@ -130,9 +130,10 @@ function startQuiz(topicIndex) {
   isRandomMode = false;
   currentTopic = topicIndex;
   const topicObj = topics[topicIndex];
+  const termCount = uniqueByLabel(topicObj.terms).length;
 
-  if (topicObj.terms.length < 4) {
-    alert(`「${topicObj.topic}」の用語が${topicObj.terms.length}個しかありません。\n4択クイズには最低4つの用語が必要です。`);
+  if (termCount < 4) {
+    alert(`「${topicObj.topic}」の用語が${termCount}個しかありません。\n4択クイズには最低4つの用語が必要です。`);
     return;
   }
 
@@ -147,19 +148,22 @@ function startQuiz(topicIndex) {
 }
 
 // =============================================
-// 問題セットを生成（全用語を1回ずつ出す）
+// 問題セットを生成（全用語を1回ずつ出す。同じ語句が複数あっても1回だけ）
 // =============================================
 function buildQuestions(topicObj) {
-  const terms = [...topicObj.terms];
+  const pool = uniqueByLabel(topicObj.terms);
+  const terms = [...pool];
   shuffle(terms);
   return terms.map(t => ({
     correct: t,
-    choices: buildChoices(t, topicObj.terms)
+    choices: buildChoices(t, pool)
   }));
 }
 
+// 選択肢に同じ語句が2つ以上並ばないよう、表示名が重ならない用語から選ぶ
 function buildChoices(correct, allTerms) {
-  const others = allTerms.filter(t => t.term !== correct.term);
+  const correctLabel = termLabel(correct);
+  const others = uniqueByLabel(allTerms).filter(t => termLabel(t) !== correctLabel);
   shuffle(others);
   const wrong = others.slice(0, 3);
   const choices = [correct, ...wrong];
@@ -183,7 +187,7 @@ function showQuestion() {
   q.choices.forEach(choice => {
     const btn = document.createElement('button');
     btn.className = 'btn btn-choice';
-    btn.textContent = choice.term;
+    btn.textContent = termLabel(choice);
     btn.addEventListener('click', () => selectAnswer(btn, choice, q.correct));
     choicesDiv.appendChild(btn);
   });
@@ -198,7 +202,8 @@ function selectAnswer(btn, selected, correct) {
   // ボタンを全部無効化
   document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true);
 
-  const isCorrect = selected.term === correct.term;
+  const correctLabel = termLabel(correct);
+  const isCorrect = termLabel(selected) === correctLabel;
   const feedback = document.getElementById('feedback');
   const feedbackText = document.getElementById('feedback-text');
   const feedbackAnswer = document.getElementById('feedback-answer');
@@ -214,11 +219,11 @@ function selectAnswer(btn, selected, correct) {
     btn.classList.add('choice-wrong');
     // 正解ボタンを緑にする
     document.querySelectorAll('.btn-choice').forEach(b => {
-      if (b.textContent === correct.term) b.classList.add('choice-correct');
+      if (b.textContent === correctLabel) b.classList.add('choice-correct');
     });
     feedbackText.textContent = '❌ 不正解';
     feedbackText.className = 'feedback-wrong';
-    feedbackAnswer.textContent = `正解：${correct.term}（${correct.reading}）`;
+    feedbackAnswer.textContent = `正解：${correctLabel}`;
     mistakes.push(correct);
     playSound('snd-incorrect');
   }
@@ -257,7 +262,7 @@ function showResult() {
     mistakesTitle.textContent = `間違えた問題（${mistakes.length}問）`;
     mistakes.forEach(m => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${m.term}</strong>（${m.reading}）<br><span class="mistake-desc">${m.description}</span>`;
+      li.innerHTML = `<strong>${termLabel(m)}</strong><br><span class="mistake-desc">${m.description}</span>`;
       mistakesList.appendChild(li);
     });
   }
@@ -268,6 +273,32 @@ function showResult() {
 // =============================================
 // ユーティリティ
 // =============================================
+
+// 画面に出す用語名。label の指定があればそれを使い、なければ丸括弧（全角・半角）とその中身を除く
+// 例：三権分立（権力分立） → 三権分立
+function termLabel(t) {
+  if (t.label) return t.label;
+  let label = t.term;
+  let prev;
+  do {
+    prev = label;
+    label = label.replace(/[（(][^（）()]*[）)]/g, '');
+  } while (label !== prev);
+  label = label.trim();
+  return label || t.term;
+}
+
+// 表示名が同じ用語は最初の1つだけ残す
+function uniqueByLabel(terms) {
+  const seen = new Set();
+  return terms.filter(t => {
+    const label = termLabel(t);
+    if (seen.has(label)) return false;
+    seen.add(label);
+    return true;
+  });
+}
+
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
