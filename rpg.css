@@ -19,6 +19,10 @@
   --bad: #ef5350;
   --bad-bg: rgba(239, 83, 80, 0.26);
   --pixel: 'DotGothic16', 'Noto Sans JP', sans-serif;
+  --xp: #4fc3f7;
+  --xp-strong: #29b6f6;
+  --danger: #c62828;
+  --danger-hover: #e53935;
 }
 
 * {
@@ -84,6 +88,14 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
+.btn-danger {
+  background: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger-hover);
+}
+
 /* =============================================
    単元選択画面
 ============================================= */
@@ -111,6 +123,112 @@ body {
 .title-lead {
   margin: 0;
   color: var(--text-muted);
+}
+
+/* プレイヤーのレベル・XP（ホーム画面） */
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 2px solid var(--xp-strong);
+  border-radius: 16px;
+  background: rgba(79, 195, 247, 0.1);
+}
+
+.player-level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 64px;
+}
+
+.player-level-value {
+  font-family: var(--pixel);
+  font-size: 2.4rem;
+  line-height: 1.1;
+  color: var(--xp);
+  font-variant-numeric: tabular-nums;
+}
+
+.player-xp {
+  flex: 1;
+  min-width: 0;
+}
+
+.xp-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.xp-row b {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: var(--xp);
+}
+
+.xp-next {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.xp-gauge {
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.xp-fill {
+  width: 0;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--xp-strong), #b3e5fc);
+  transition: width 0.8s ease-out;
+}
+
+.player-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.player-stats b {
+  color: var(--text);
+}
+
+.storage-warning {
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.btn-reset {
+  display: block;
+  margin: 16px auto 0;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .rules {
@@ -191,11 +309,26 @@ body {
   color: var(--accent);
 }
 
-.unit-count {
+.unit-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   flex-shrink: 0;
+  line-height: 1.35;
+}
+
+.unit-count {
   font-size: 0.8rem;
   font-weight: 400;
   color: var(--text-muted);
+}
+
+.unit-best {
+  font-family: var(--pixel);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--accent);
+  white-space: nowrap;
 }
 
 .link-back {
@@ -503,6 +636,76 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.result-best {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.result-best.new {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #3e2723;
+  font-weight: 900;
+  animation: best 0.6s ease-out;
+}
+
+.result-xp {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 2px solid var(--xp-strong);
+  border-radius: 16px;
+  background: rgba(79, 195, 247, 0.1);
+}
+
+.xp-gained {
+  font-size: 1.4rem !important;
+}
+
+.result-level {
+  font-family: var(--pixel);
+  font-size: 1.3rem;
+  color: var(--xp);
+}
+
+.result-xp .xp-next {
+  margin-top: 6px;
+}
+
+.level-up {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 213, 79, 0.25), rgba(79, 195, 247, 0.25));
+  border: 2px solid var(--accent);
+}
+
+.level-up-title {
+  font-family: var(--pixel);
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  line-height: 1.2;
+  color: var(--accent);
+  text-shadow: 0 3px 0 #000, 0 0 16px rgba(255, 213, 79, 0.7);
+}
+
+.level-up-detail {
+  font-family: var(--pixel);
+  font-size: 1.2rem;
+}
+
+.level-up.play {
+  animation: levelup 0.9s ease-out;
+}
+
+.result-xp .storage-warning {
+  margin: 10px 0 0;
+}
+
 .result-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -545,8 +748,57 @@ body {
 }
 
 /* =============================================
+   確認画面（記録のリセット）
+============================================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #1a1f52;
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.modal-text {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}
+
+.modal-text b {
+  color: #ef9a9a;
+}
+
+/* =============================================
    アニメーション
 ============================================= */
+@keyframes levelup {
+  0% { opacity: 0; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes best {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 @keyframes hit {
   0% { transform: scale(1); }
   40% { transform: scale(1.05); box-shadow: 0 0 22px rgba(102, 187, 106, 0.8); }
@@ -574,8 +826,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .choice.hit,
   .choice.miss,
-  .hud-value.bump {
+  .hud-value.bump,
+  .level-up.play,
+  .result-best.new {
     animation: none;
+  }
+
+  .xp-fill {
+    transition: none;
   }
 
   .score-pop.show {

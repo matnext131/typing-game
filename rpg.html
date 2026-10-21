@@ -23,6 +23,27 @@
         <p class="title-lead">10問勝負！連続正解でコンボ倍率アップ</p>
       </header>
 
+      <div class="player-card">
+        <div class="player-level">
+          <span class="hud-label">LEVEL</span>
+          <span id="home-level" class="player-level-value">1</span>
+        </div>
+        <div class="player-xp">
+          <div class="xp-row">
+            <span>累計 <b id="home-total-xp">0</b> XP</span>
+            <span id="home-next-xp" class="xp-next"></span>
+          </div>
+          <div class="xp-gauge" role="progressbar" aria-label="次のレベルまでの経験値" aria-valuemin="0">
+            <div id="home-xp-fill" class="xp-fill"></div>
+          </div>
+          <div class="player-stats">
+            <span>プレイ <b id="home-plays">0</b>回</span>
+            <span>正解 <b id="home-correct">0</b>問</span>
+          </div>
+        </div>
+      </div>
+      <p id="storage-warning" class="storage-warning hidden">この端末では記録を保存できないため、ページを閉じると記録が消えます。</p>
+
       <div class="rules">
         <span>正解 <b>100点</b></span>
         <span>3連続 <b>×1.5</b></span>
@@ -34,6 +55,7 @@
       <div id="unit-list" class="unit-list"></div>
 
       <a href="index.html" class="link-back">← 通常の4択クイズへ</a>
+      <button id="btn-reset" class="btn-reset" type="button">記録をリセット</button>
     </section>
 
     <!-- プレイ画面 -->
@@ -87,6 +109,7 @@
       <div class="result-score">
         <span class="hud-label">SCORE</span>
         <span id="result-score" class="result-score-value">0</span>
+        <span id="result-best" class="result-best"></span>
       </div>
 
       <div class="result-stats">
@@ -100,6 +123,22 @@
         </div>
       </div>
 
+      <div class="result-xp">
+        <div class="xp-row">
+          <span>獲得 <b id="result-xp-gained" class="xp-gained">+0</b> XP</span>
+          <span id="result-level" class="result-level"></span>
+        </div>
+        <div class="xp-gauge" role="progressbar" aria-label="次のレベルまでの経験値" aria-valuemin="0">
+          <div id="result-xp-fill" class="xp-fill"></div>
+        </div>
+        <p id="result-next-xp" class="xp-next"></p>
+        <div id="level-up" class="level-up hidden" aria-live="polite">
+          <span class="level-up-title">LEVEL UP!</span>
+          <span id="level-up-detail" class="level-up-detail"></span>
+        </div>
+        <p id="result-save-warning" class="storage-warning hidden">記録を保存できませんでした（この画面を閉じると消えます）。</p>
+      </div>
+
       <div class="mistakes">
         <h3 id="mistakes-title" class="mistakes-title"></h3>
         <ul id="mistakes-list" class="mistakes-list"></ul>
@@ -108,6 +147,16 @@
       <button id="btn-retry" class="btn btn-primary" type="button">もう一度挑戦</button>
       <button id="btn-back" class="btn btn-secondary" type="button">単元選択へ戻る</button>
     </section>
+
+    <!-- 記録リセットの確認 -->
+    <div id="reset-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="reset-title">
+      <div class="modal-card">
+        <h2 id="reset-title" class="modal-title">記録をリセットしますか？</h2>
+        <p class="modal-text">この端末に保存されているレベル・累計XP・プレイ回数・正解数・自己ベストがすべて消えます。<b>元に戻すことはできません。</b></p>
+        <button id="btn-reset-cancel" class="btn btn-secondary" type="button">やめる</button>
+        <button id="btn-reset-confirm" class="btn btn-danger" type="button">すべて消去する</button>
+      </div>
+    </div>
 
   </main>
 

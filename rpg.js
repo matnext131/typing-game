@@ -1,7 +1,8 @@
 // =============================================
 // 社会科クエスト（アーケード×RPGモード 第1弾）
 // 通常クイズ（index.html / script.js）とは独立して動く。
-// data.js の topics を読むだけで、データの書き換えや保存は行わない。
+// data.js の topics は読むだけで書き換えない。
+// レベル・XP・自己ベストはこの端末の localStorage にだけ保存する（通信はしない）。
 // =============================================
 
 const QUESTIONS_PER_PLAY = 10;
@@ -14,10 +15,21 @@ const COMBO_STEPS = [
 ];
 const SUBJECTS = ['地理', '歴史', '公民'];
 
+// 経験値とレベル（第2弾）
+const XP_PER_CORRECT = 10;
+// レベルLからL+1に上がるのに必要なXP（Lv.1→2が50XP、以後1レベルごとに25XPずつ増える）
+const LEVEL_BASE_XP = 50;
+const LEVEL_STEP_XP = 25;
+const STORAGE_KEY = 'shakai-quest-record-v1';
+const MAX_COUNT = 1e9; // 壊れたデータで極端な値が入っていた場合の上限
+
 // =============================================
 // 状態管理
 // =============================================
 const units = buildUnits();
+let storageAvailable = true;
+let record = loadRecord();
+let playRecorded = false; // 今のプレイの記録を保存済みか（二重加算の防止）
 let currentSubject = SUBJECTS[0];
 let currentUnit = null;
 let questions = [];
@@ -44,13 +56,16 @@ function showScreen(id) {
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
   buildSubjectTabs();
-  renderUnitList();
+  renderHome();
   showScreen('screen-select');
 
   document.getElementById('btn-next').addEventListener('click', nextQuestion);
   document.getElementById('btn-quit').addEventListener('click', backToSelect);
   document.getElementById('btn-retry').addEventListener('click', () => startQuest(currentUnit));
   document.getElementById('btn-back').addEventListener('click', backToSelect);
+  document.getElementById('btn-reset').addEventListener('click', openResetDialog);
+  document.getElementById('btn-reset-cancel').addEventListener('click', closeResetDialog);
+  document.getElementById('btn-reset-confirm').addEventListener('click', resetRecord);
   document.addEventListener('keydown', handleKey);
 });
 
@@ -121,11 +136,22 @@ function renderUnitList() {
 
     const name = document.createElement('span');
     name.textContent = unit.name;
+    const meta = document.createElement('span');
+    meta.className = 'unit-meta';
     const count = document.createElement('span');
     count.className = 'unit-count';
     count.textContent = `全${questionCount(unit)}問`;
+    meta.appendChild(count);
 
-    btn.append(name, count);
+    const best = record.bestScores[unitKey(unit)];
+    if (best !== undefined) {
+      const bestEl = document.createElement('span');
+      bestEl.className = 'unit-best';
+      bestEl.textContent = `ベスト ${best}`;
+      meta.appendChild(bestEl);
+    }
+
+    btn.append(name, meta);
     btn.addEventListener('click', () => startQuest(unit));
     list.appendChild(btn);
   });
@@ -135,9 +161,35 @@ function questionCount(unit) {
   return Math.min(QUESTIONS_PER_PLAY, unit.terms.length);
 }
 
+// 自己ベストを記録するときの単元名（例：「地理：アジア州」「公民：全単元ミックス」）
+function unitKey(unit) {
+  return `${unit.subject}：${unit.name}`;
+}
+
+// ホーム画面のレベル・XP・プレイ記録と単元一覧
+function renderHome() {
+  const info = levelInfo(record.totalXp);
+  document.getElementById('home-level').textContent = info.level;
+  document.getElementById('home-total-xp').textContent = record.totalXp;
+  document.getElementById('home-next-xp').textContent = `次のレベルまで あと ${info.xpToNextLevel} XP`;
+  document.getElementById('home-plays').textContent = record.totalPlays;
+  document.getElementById('home-correct').textContent = record.totalCorrect;
+  setGauge('home-xp-fill', info);
+  document.getElementById('storage-warning').classList.toggle('hidden', storageAvailable);
+  renderUnitList();
+}
+
+function setGauge(fillId, info) {
+  const fill = document.getElementById(fillId);
+  fill.style.width = `${(info.xpInLevel / info.xpForNext) * 100}%`;
+  const gauge = fill.parentElement;
+  gauge.setAttribute('aria-valuemax', info.xpForNext);
+  gauge.setAttribute('aria-valuenow', info.xpInLevel);
+}
+
 function backToSelect() {
   currentSubject = currentUnit ? currentUnit.subject : currentSubject;
-  renderUnitList();
+  renderHome();
   showScreen('screen-select');
 }
 
@@ -162,6 +214,7 @@ function startQuest(unit) {
   correctCount = 0;
   mistakes = [];
   results = [];
+  playRecorded = false;
 
   document.getElementById('hud-unit').textContent = `${unit.subject}：${unit.name}`;
   updateHud();
@@ -287,6 +340,10 @@ function nextQuestion() {
 
 // キーボードでも遊べるように1〜4で選択（回答後は「次へ」にフォーカスが移るのでEnterで進める）
 function handleKey(e) {
+  if (e.key === 'Escape' && isResetDialogOpen()) {
+    closeResetDialog();
+    return;
+  }
   if (document.getElementById('screen-battle').classList.contains('hidden')) return;
   if (!answered && ['1', '2', '3', '4'].includes(e.key)) {
     const btn = document.querySelectorAll('.choice')[Number(e.key) - 1];
@@ -335,10 +392,14 @@ function showScorePop(text) {
 // 結果表示
 // =============================================
 function showResult() {
+  // 最後まで解いたプレイだけを記録する（「やめる」で中断したプレイはここに来ない）
+  const outcome = recordPlay();
+
   document.getElementById('result-unit').textContent = `${currentUnit.subject}：${currentUnit.name}`;
   document.getElementById('result-score').textContent = score;
   document.getElementById('result-correct').textContent = `${correctCount}/${questions.length}`;
   document.getElementById('result-max-combo').textContent = maxCombo;
+  if (outcome) renderOutcome(outcome);
 
   const title = document.getElementById('mistakes-title');
   const list = document.getElementById('mistakes-list');
@@ -362,6 +423,164 @@ function showResult() {
   }
 
   showScreen('screen-result');
+}
+
+// 獲得XP・レベルアップ・自己ベストの表示
+function renderOutcome(o) {
+  document.getElementById('result-xp-gained').textContent = `+${o.xpGained}`;
+  document.getElementById('result-level').textContent = `Lv.${o.after.level}`;
+  document.getElementById('result-next-xp').textContent =
+    `累計 ${record.totalXp} XP ／ 次のレベルまで あと ${o.after.xpToNextLevel} XP`;
+  setGauge('result-xp-fill', o.after);
+
+  const levelUp = document.getElementById('level-up');
+  const leveledUp = o.after.level > o.before.level;
+  levelUp.classList.toggle('hidden', !leveledUp);
+  if (leveledUp) {
+    document.getElementById('level-up-detail').textContent = `Lv.${o.before.level} → Lv.${o.after.level}`;
+    levelUp.classList.remove('play');
+    void levelUp.offsetWidth; // アニメーションを最初から再生するため
+    levelUp.classList.add('play');
+  }
+
+  const best = document.getElementById('result-best');
+  best.className = 'result-best';
+  if (o.isFirst) {
+    best.textContent = '🎉 この単元の初記録！';
+    best.classList.add('new');
+  } else if (o.isNewBest) {
+    best.textContent = `🏆 自己ベスト更新！（これまで ${o.prevBest}）`;
+    best.classList.add('new');
+  } else {
+    best.textContent = `自己ベスト ${o.prevBest}`;
+  }
+
+  document.getElementById('result-save-warning').classList.toggle('hidden', o.saved);
+}
+
+// =============================================
+// 記録（レベル・XP・自己ベスト）
+// =============================================
+function defaultRecord() {
+  return { version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {} };
+}
+
+// 保存データがない・壊れている・読めない場合は、初期状態で始める
+function loadRecord() {
+  let raw = null;
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    storageAvailable = false;
+    return defaultRecord();
+  }
+  if (!raw) return defaultRecord();
+  try {
+    return sanitizeRecord(JSON.parse(raw));
+  } catch (e) {
+    return defaultRecord();
+  }
+}
+
+// 読み込んだデータのうち、正しい形の値だけを使う
+function sanitizeRecord(data) {
+  const rec = defaultRecord();
+  if (!data || typeof data !== 'object') return rec;
+  rec.totalXp = toCount(data.totalXp);
+  rec.totalPlays = toCount(data.totalPlays);
+  rec.totalCorrect = toCount(data.totalCorrect);
+  if (data.bestScores && typeof data.bestScores === 'object' && !Array.isArray(data.bestScores)) {
+    Object.keys(data.bestScores).forEach(key => {
+      const value = data.bestScores[key];
+      if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+        rec.bestScores[key] = Math.min(Math.floor(value), MAX_COUNT);
+      }
+    });
+  }
+  return rec;
+}
+
+function toCount(value) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? Math.min(Math.floor(value), MAX_COUNT)
+    : 0;
+}
+
+function saveRecord() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+    storageAvailable = true;
+    return true;
+  } catch (e) {
+    storageAvailable = false;
+    return false;
+  }
+}
+
+// 1プレイ分を記録する。同じプレイで2回呼ばれても1回分しか加算しない
+function recordPlay() {
+  if (playRecorded) return null;
+  playRecorded = true;
+
+  const key = unitKey(currentUnit);
+  const prevBest = record.bestScores[key];
+  const before = levelInfo(record.totalXp);
+  const xpGained = correctCount * XP_PER_CORRECT;
+
+  record.totalXp = Math.min(record.totalXp + xpGained, MAX_COUNT);
+  record.totalPlays = Math.min(record.totalPlays + 1, MAX_COUNT);
+  record.totalCorrect = Math.min(record.totalCorrect + correctCount, MAX_COUNT);
+  const isFirst = prevBest === undefined;
+  const isNewBest = isFirst || score > prevBest;
+  if (isNewBest) record.bestScores[key] = score;
+
+  const saved = saveRecord();
+  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, saved };
+}
+
+// レベルLからL+1に上がるのに必要なXP
+function xpForLevel(level) {
+  return LEVEL_BASE_XP + (level - 1) * LEVEL_STEP_XP;
+}
+
+// 累計XPから、現在のレベルとレベル内の進み具合を求める
+function levelInfo(totalXp) {
+  let level = 1;
+  let rest = totalXp;
+  while (rest >= xpForLevel(level)) {
+    rest -= xpForLevel(level);
+    level++;
+  }
+  const xpForNext = xpForLevel(level);
+  return { level, xpInLevel: rest, xpForNext, xpToNextLevel: xpForNext - rest };
+}
+
+// =============================================
+// 記録のリセット（確認画面つき）
+// =============================================
+function openResetDialog() {
+  document.getElementById('reset-dialog').classList.remove('hidden');
+  document.getElementById('btn-reset-cancel').focus();
+}
+
+function closeResetDialog() {
+  document.getElementById('reset-dialog').classList.add('hidden');
+  document.getElementById('btn-reset').focus();
+}
+
+function isResetDialogOpen() {
+  return !document.getElementById('reset-dialog').classList.contains('hidden');
+}
+
+function resetRecord() {
+  record = defaultRecord();
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    // 保存できない環境では、画面上の記録を初期状態に戻すだけ
+  }
+  closeResetDialog();
+  renderHome();
 }
 
 // =============================================
