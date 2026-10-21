@@ -129,6 +129,21 @@ h3 {
   background: rgba(255, 193, 7, 0.3);
 }
 
+/* 社会科クエスト（RPGモード）への入口 */
+.btn-quest {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #5c6bc0, #7e57c2);
+  border: 2px solid #ffd54f;
+  color: #fff;
+  font-size: 1.15rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-quest:hover {
+  background: linear-gradient(135deg, #7986cb, #9575cd);
+}
+
 /* =============================================
    テキスト入力（パスワード画面）
 ============================================= */

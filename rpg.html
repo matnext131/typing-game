@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社会科クエスト</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rpg.css">
+</head>
+<body>
+
+  <audio id="snd-correct" src="correct.mp3" preload="auto"></audio>
+  <audio id="snd-incorrect" src="incorrect.mp3" preload="auto"></audio>
+
+  <main class="app">
+
+    <!-- 単元選択画面 -->
+    <section id="screen-select" class="screen">
+      <header class="title">
+        <p class="title-kicker">ARCADE × RPG</p>
+        <h1 class="title-main">社会科クエスト</h1>
+        <p class="title-lead">10問勝負！連続正解でコンボ倍率アップ</p>
+      </header>
+
+      <div class="rules">
+        <span>正解 <b>100点</b></span>
+        <span>3連続 <b>×1.5</b></span>
+        <span>5連続 <b>×2</b></span>
+        <span>10連続 <b>×3</b></span>
+      </div>
+
+      <div id="subject-tabs" class="subject-tabs" role="tablist" aria-label="分野"></div>
+      <div id="unit-list" class="unit-list"></div>
+
+      <a href="index.html" class="link-back">← 通常の4択クイズへ</a>
+    </section>
+
+    <!-- プレイ画面 -->
+    <section id="screen-battle" class="screen hidden">
+      <div class="hud">
+        <div class="hud-top">
+          <span id="hud-unit" class="hud-unit"></span>
+          <button id="btn-quit" class="btn-quit" type="button">やめる</button>
+        </div>
+        <div class="hud-stats">
+          <div class="hud-box">
+            <span class="hud-label">SCORE</span>
+            <span id="hud-score" class="hud-value">0</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-label">COMBO</span>
+            <span id="hud-combo" class="hud-value">0</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-label">倍率</span>
+            <span id="hud-multiplier" class="hud-value">×1</span>
+          </div>
+        </div>
+        <ol id="hud-pips" class="pips" aria-label="進み具合"></ol>
+      </div>
+
+      <div class="question-card">
+        <p class="question-meta"><span id="question-number"></span>この説明にあてはまる用語は？</p>
+        <p id="question-text" class="question-text"></p>
+      </div>
+
+      <div class="choices-wrap">
+        <div id="choices" class="choices"></div>
+        <div id="score-pop" class="score-pop" aria-hidden="true"></div>
+      </div>
+
+      <div id="feedback" class="feedback hidden" aria-live="polite">
+        <p id="feedback-text" class="feedback-text"></p>
+        <p id="feedback-detail" class="feedback-detail"></p>
+        <button id="btn-next" class="btn btn-primary" type="button">次へ</button>
+      </div>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="screen-result" class="screen hidden">
+      <header class="result-head">
+        <p class="title-kicker">QUEST CLEAR</p>
+        <h2 id="result-unit" class="result-unit"></h2>
+      </header>
+
+      <div class="result-score">
+        <span class="hud-label">SCORE</span>
+        <span id="result-score" class="result-score-value">0</span>
+      </div>
+
+      <div class="result-stats">
+        <div class="hud-box">
+          <span class="hud-label">正解数</span>
+          <span id="result-correct" class="hud-value"></span>
+        </div>
+        <div class="hud-box">
+          <span class="hud-label">最大コンボ</span>
+          <span id="result-max-combo" class="hud-value"></span>
+        </div>
+      </div>
+
+      <div class="mistakes">
+        <h3 id="mistakes-title" class="mistakes-title"></h3>
+        <ul id="mistakes-list" class="mistakes-list"></ul>
+      </div>
+
+      <button id="btn-retry" class="btn btn-primary" type="button">もう一度挑戦</button>
+      <button id="btn-back" class="btn btn-secondary" type="button">単元選択へ戻る</button>
+    </section>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="rpg.js"></script>
+</body>
+</html>
