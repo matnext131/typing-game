@@ -209,6 +209,67 @@ body {
   color: var(--text);
 }
 
+/* 前回の単元（ホーム画面） */
+.last-played {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.last-played-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.last-played-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.last-played-best {
+  font-family: var(--pixel);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.btn-last-played {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-last-played:hover {
+  background: var(--primary-hover);
+}
+
+/* 自己ベストのランク表示（単元ボタン・前回の単元） */
+.rank-chip {
+  display: inline-block;
+  min-width: 1.5em;
+  margin-left: 6px;
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-family: var(--pixel);
+  line-height: 1.4;
+  text-align: center;
+  text-shadow: none;
+}
+
 .storage-warning {
   margin: 0 0 14px;
   padding: 8px 12px;
@@ -408,9 +469,34 @@ body {
   animation: bump 0.35s ease-out;
 }
 
-.hud-box.combo-hot {
-  border-color: var(--accent-strong);
-  box-shadow: 0 0 14px rgba(255, 179, 0, 0.45);
+/* コンボ数に応じたHUDの色（3コンボ：水色、5コンボ：オレンジ、10コンボ：金） */
+.hud-box.combo-tier-1 {
+  border-color: var(--xp);
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.4);
+}
+
+.hud-box.combo-tier-1 .hud-value {
+  color: var(--xp);
+}
+
+.hud-box.combo-tier-2 {
+  border-color: #ff9800;
+  box-shadow: 0 0 14px rgba(255, 152, 0, 0.5);
+}
+
+.hud-box.combo-tier-2 .hud-value {
+  color: #ffb74d;
+}
+
+.hud-box.combo-tier-3 {
+  border-color: var(--accent);
+  background: rgba(255, 213, 79, 0.16);
+  box-shadow: 0 0 18px rgba(255, 213, 79, 0.7);
+}
+
+.hud-box.combo-tier-3 .hud-value {
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(255, 213, 79, 0.8);
 }
 
 .pips {
@@ -546,29 +632,99 @@ body {
 }
 
 .choice.hit {
-  animation: hit 0.45s ease-out;
+  position: relative;
+  z-index: 1;
+  animation: hit 0.5s ease-out;
 }
 
 .choice.miss {
   animation: shake 0.4s ease-in-out;
 }
 
+/* 正解したときに選択肢エリアをごく軽く弾ませる */
+.choices.pulse {
+  animation: pulse 0.3s ease-out;
+}
+
 .score-pop {
   position: absolute;
   left: 50%;
   top: 40%;
+  z-index: 2;
   transform: translate(-50%, -50%);
   pointer-events: none;
   font-family: var(--pixel);
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-size: clamp(2rem, 7vw, 2.8rem);
   color: var(--accent);
   text-shadow: 0 3px 0 #000, 0 0 16px rgba(255, 213, 79, 0.7);
   white-space: nowrap;
   opacity: 0;
 }
 
+.score-pop.tier-1 {
+  color: var(--xp);
+  text-shadow: 0 3px 0 #000, 0 0 18px rgba(79, 195, 247, 0.8);
+}
+
+.score-pop.tier-2 {
+  font-size: clamp(2.3rem, 8vw, 3.2rem);
+  color: #ffb74d;
+  text-shadow: 0 3px 0 #000, 0 0 20px rgba(255, 152, 0, 0.85);
+}
+
+.score-pop.tier-3 {
+  font-size: clamp(2.6rem, 9vw, 3.6rem);
+  color: var(--accent);
+  text-shadow: 0 3px 0 #000, 0 0 24px rgba(255, 213, 79, 1), 0 0 40px rgba(255, 152, 0, 0.6);
+}
+
 .score-pop.show {
-  animation: pop 0.9s ease-out forwards;
+  animation: pop 1s ease-out forwards;
+}
+
+/* 3・5・10コンボ到達時と、コンボが途切れたときに中央へ短く出す表示 */
+.combo-banner {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-family: var(--pixel);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.combo-banner.show {
+  animation: banner 1.1s ease-out forwards;
+}
+
+.combo-banner.tier-1 {
+  font-size: clamp(2rem, 9vw, 3rem);
+  color: var(--xp);
+  text-shadow: 0 4px 0 #000, 0 0 20px rgba(79, 195, 247, 0.9);
+}
+
+.combo-banner.tier-2 {
+  font-size: clamp(2.3rem, 10vw, 3.6rem);
+  color: #ffb74d;
+  text-shadow: 0 4px 0 #000, 0 0 24px rgba(255, 152, 0, 0.9);
+}
+
+.combo-banner.tier-3 {
+  font-size: clamp(2.6rem, 11vw, 4.4rem);
+  color: var(--accent);
+  text-shadow: 0 4px 0 #000, 0 0 28px rgba(255, 213, 79, 1), 0 0 50px rgba(255, 152, 0, 0.7);
+}
+
+.combo-banner.break {
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  color: #b0bec5;
+  text-shadow: 0 3px 0 #000;
+}
+
+.combo-banner.break.show {
+  animation: banner-soft 0.9s ease-out forwards;
 }
 
 .feedback {
@@ -586,7 +742,23 @@ body {
 }
 
 .feedback-text.good {
+  font-family: var(--pixel);
+  font-weight: 400;
+  letter-spacing: 0.05em;
   color: #a5d6a7;
+}
+
+.feedback-text.good.tier-1 {
+  color: var(--xp);
+}
+
+.feedback-text.good.tier-2 {
+  color: #ffb74d;
+}
+
+.feedback-text.good.tier-3 {
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(255, 213, 79, 0.7);
 }
 
 .feedback-text.bad {
@@ -628,6 +800,52 @@ body {
   background: rgba(255, 213, 79, 0.1);
 }
 
+.result-score-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.rank-box,
+.score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rank-badge {
+  font-family: var(--pixel);
+  font-size: clamp(3.2rem, 14vw, 4.4rem);
+  line-height: 1;
+  text-shadow: 0 4px 0 #000;
+}
+
+.rank-badge.stamp {
+  animation: stamp 0.5s ease-out;
+}
+
+.rank-S {
+  color: var(--accent);
+  text-shadow: 0 4px 0 #000, 0 0 20px rgba(255, 213, 79, 0.9);
+}
+
+.rank-A {
+  color: #ffb74d;
+}
+
+.rank-B {
+  color: var(--xp);
+}
+
+.rank-C {
+  color: #a5d6a7;
+}
+
+.rank-D {
+  color: #b0bec5;
+}
+
 .result-score-value {
   font-family: var(--pixel);
   font-size: clamp(2.6rem, 10vw, 3.6rem);
@@ -637,19 +855,40 @@ body {
 }
 
 .result-best {
-  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8px;
   font-size: 0.95rem;
   color: var(--text-muted);
   text-align: center;
 }
 
 .result-best.new {
-  padding: 4px 14px;
-  border-radius: 999px;
+  padding: 6px 18px;
+  border-radius: 14px;
   background: var(--accent);
   color: #3e2723;
-  font-weight: 900;
   animation: best 0.6s ease-out;
+}
+
+.new-record {
+  font-family: var(--pixel);
+  font-size: 1.4rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+}
+
+.new-record-sub {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.result-cheer {
+  margin: 8px 0 0;
+  font-weight: 900;
+  color: var(--accent);
+  text-align: center;
 }
 
 .result-xp {
@@ -675,6 +914,7 @@ body {
 }
 
 .level-up {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -700,6 +940,24 @@ body {
 
 .level-up.play {
   animation: levelup 0.9s ease-out;
+}
+
+/* レベルアップ時のピクセル風紙吹雪 */
+.particles {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  animation: particle 1.2s ease-out var(--delay) forwards;
 }
 
 .result-xp .storage-warning {
@@ -801,8 +1059,38 @@ body {
 
 @keyframes hit {
   0% { transform: scale(1); }
-  40% { transform: scale(1.05); box-shadow: 0 0 22px rgba(102, 187, 106, 0.8); }
+  35% { transform: scale(1.06); box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.6), 0 0 28px rgba(102, 187, 106, 0.95); }
+  100% { transform: scale(1); box-shadow: 0 0 10px rgba(102, 187, 106, 0.4); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+}
+
+@keyframes banner {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  30% { transform: translate(-50%, -50%) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+}
+
+@keyframes banner-soft {
+  0% { opacity: 0; }
+  20%, 60% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+@keyframes stamp {
+  0% { opacity: 0; transform: scale(2); }
+  60% { opacity: 1; transform: scale(0.92); }
   100% { transform: scale(1); }
+}
+
+@keyframes particle {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(180deg); }
 }
 
 @keyframes shake {
@@ -813,8 +1101,9 @@ body {
 
 @keyframes pop {
   0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
-  25% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); }
-  100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
+  20% { opacity: 1; transform: translate(-50%, -70%) scale(1.2); }
+  45% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -190%) scale(1); }
 }
 
 @keyframes bump {
@@ -823,20 +1112,29 @@ body {
   100% { transform: scale(1); }
 }
 
+/* 動きを減らす設定のときは、拡大・揺れ・飛び出し・紙吹雪をやめ、表示と色だけで伝える */
 @media (prefers-reduced-motion: reduce) {
   .choice.hit,
   .choice.miss,
+  .choices.pulse,
   .hud-value.bump,
   .level-up.play,
+  .rank-badge.stamp,
   .result-best.new {
     animation: none;
+  }
+
+  .particles {
+    display: none;
   }
 
   .xp-fill {
     transition: none;
   }
 
-  .score-pop.show {
+  .score-pop.show,
+  .combo-banner.show,
+  .combo-banner.break.show {
     animation: fade 0.9s ease-out forwards;
   }
 

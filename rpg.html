@@ -44,6 +44,15 @@
       </div>
       <p id="storage-warning" class="storage-warning hidden">この端末では記録を保存できないため、ページを閉じると記録が消えます。</p>
 
+      <div id="last-played" class="last-played hidden">
+        <div class="last-played-info">
+          <span class="hud-label">前回の単元</span>
+          <span id="last-played-name" class="last-played-name"></span>
+          <span id="last-played-best" class="last-played-best"></span>
+        </div>
+        <button id="btn-last-played" class="btn-last-played" type="button">もう一度</button>
+      </div>
+
       <div class="rules">
         <span>正解 <b>100点</b></span>
         <span>3連続 <b>×1.5</b></span>
@@ -97,6 +106,8 @@
         <p id="feedback-detail" class="feedback-detail"></p>
         <button id="btn-next" class="btn btn-primary" type="button">次へ</button>
       </div>
+
+      <div id="combo-banner" class="combo-banner" aria-hidden="true"></div>
     </section>
 
     <!-- 結果画面 -->
@@ -107,9 +118,18 @@
       </header>
 
       <div class="result-score">
-        <span class="hud-label">SCORE</span>
-        <span id="result-score" class="result-score-value">0</span>
+        <div class="result-score-top">
+          <div class="rank-box">
+            <span class="hud-label">RANK</span>
+            <span id="result-rank" class="rank-badge"></span>
+          </div>
+          <div class="score-box">
+            <span class="hud-label">SCORE</span>
+            <span id="result-score" class="result-score-value">0</span>
+          </div>
+        </div>
         <span id="result-best" class="result-best"></span>
+        <p id="result-cheer" class="result-cheer hidden"></p>
       </div>
 
       <div class="result-stats">
@@ -133,6 +153,7 @@
         </div>
         <p id="result-next-xp" class="xp-next"></p>
         <div id="level-up" class="level-up hidden" aria-live="polite">
+          <div id="particles" class="particles" aria-hidden="true"></div>
           <span class="level-up-title">LEVEL UP!</span>
           <span id="level-up-detail" class="level-up-detail"></span>
         </div>

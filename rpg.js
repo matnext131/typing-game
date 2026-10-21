@@ -23,6 +23,12 @@ const LEVEL_STEP_XP = 25;
 const STORAGE_KEY = 'shakai-quest-record-v1';
 const MAX_COUNT = 1e9; // 壊れたデータで極端な値が入っていた場合の上限
 
+// ランクは間違えた数で決める（10問なら S:全問正解 A:9問 B:7〜8問 C:5〜6問 D:4問以下）
+const RANKS = ['S', 'A', 'B', 'C', 'D'];
+// コンボ数に応じた演出の段階（0〜3）と、正解時のほめ言葉
+const PRAISES = ['GOOD', 'NICE', 'GREAT', 'PERFECT'];
+const PARTICLE_COLORS = ['#ffd54f', '#4fc3f7', '#66bb6a', '#ef5350', '#ba68c8', '#ffffff'];
+
 // =============================================
 // 状態管理
 // =============================================
@@ -41,6 +47,7 @@ let correctCount = 0;
 let mistakes = [];
 let results = [];      // 各問の正誤（true / false）
 let answered = false;
+let effectTimers = []; // 演出用のタイマー（画面を移るときにまとめて止める）
 
 // =============================================
 // 画面切り替え
@@ -63,6 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-quit').addEventListener('click', backToSelect);
   document.getElementById('btn-retry').addEventListener('click', () => startQuest(currentUnit));
   document.getElementById('btn-back').addEventListener('click', backToSelect);
+  document.getElementById('btn-last-played').addEventListener('click', () => {
+    const unit = lastPlayedUnit();
+    if (unit) startQuest(unit);
+  });
   document.getElementById('btn-reset').addEventListener('click', openResetDialog);
   document.getElementById('btn-reset-cancel').addEventListener('click', closeResetDialog);
   document.getElementById('btn-reset-confirm').addEventListener('click', resetRecord);
@@ -148,6 +159,8 @@ function renderUnitList() {
       const bestEl = document.createElement('span');
       bestEl.className = 'unit-best';
       bestEl.textContent = `ベスト ${best}`;
+      const rank = record.bestRanks[unitKey(unit)];
+      if (rank) bestEl.appendChild(rankChip(rank));
       meta.appendChild(bestEl);
     }
 
@@ -176,7 +189,33 @@ function renderHome() {
   document.getElementById('home-correct').textContent = record.totalCorrect;
   setGauge('home-xp-fill', info);
   document.getElementById('storage-warning').classList.toggle('hidden', storageAvailable);
+  renderLastPlayed();
   renderUnitList();
+}
+
+// 前回最後まで遊んだ単元（データが変わって見つからない場合は表示しない）
+function lastPlayedUnit() {
+  return units.find(u => unitKey(u) === record.lastUnit) || null;
+}
+
+function renderLastPlayed() {
+  const box = document.getElementById('last-played');
+  const unit = lastPlayedUnit();
+  box.classList.toggle('hidden', !unit);
+  if (!unit) return;
+
+  const key = unitKey(unit);
+  document.getElementById('last-played-name').textContent = key;
+  const bestEl = document.getElementById('last-played-best');
+  bestEl.textContent = record.bestScores[key] !== undefined ? `ベスト ${record.bestScores[key]}` : '';
+  if (record.bestRanks[key]) bestEl.appendChild(rankChip(record.bestRanks[key]));
+}
+
+function rankChip(rank) {
+  const chip = document.createElement('span');
+  chip.className = `rank-chip rank-${rank}`;
+  chip.textContent = rank;
+  return chip;
 }
 
 function setGauge(fillId, info) {
@@ -188,6 +227,7 @@ function setGauge(fillId, info) {
 }
 
 function backToSelect() {
+  clearEffects();
   currentSubject = currentUnit ? currentUnit.subject : currentSubject;
   renderHome();
   showScreen('screen-select');
@@ -197,6 +237,7 @@ function backToSelect() {
 // クエスト開始
 // =============================================
 function startQuest(unit) {
+  clearEffects();
   currentUnit = unit;
 
   // 出題順はランダム、1プレイの中で同じ用語は出さない
@@ -288,15 +329,20 @@ function selectAnswer(btn, selected) {
     const points = Math.round(BASE_POINTS * multiplier);
     score += points;
 
+    const tier = comboTier(combo);
     btn.classList.add('correct', 'hit');
-    feedbackText.textContent = '⭕ 正解！';
-    feedbackText.className = 'feedback-text good';
+    feedbackText.textContent = `⭕ ${PRAISES[tier]}!`;
+    feedbackText.className = `feedback-text good tier-${tier}`;
     feedbackDetail.textContent = multiplier > 1
       ? `${combo}コンボ！ ×${multiplier} で +${points}点`
       : `+${points}点`;
-    showScorePop(`+${points}`);
+    showScorePop(`+${points}`, tier);
+    replayAnimation(document.getElementById('choices'), 'pulse');
     bump('hud-score');
     bump('hud-combo');
+    if (combo === 3) showComboBanner('3 COMBO', 'tier-1');
+    if (combo === 5) showComboBanner('5 COMBO ×2', 'tier-2');
+    if (combo === 10) showComboBanner('10 COMBO ×3', 'tier-3');
     playSound('snd-correct');
   } else {
     const lostCombo = combo;
@@ -310,6 +356,8 @@ function selectAnswer(btn, selected) {
     feedbackText.textContent = '❌ 不正解';
     feedbackText.className = 'feedback-text bad';
     feedbackDetail.textContent = `正解：${correctLabel}` + (lostCombo >= 2 ? `（${lostCombo}コンボが途切れた…）` : '');
+    // コンボがつながっていたときだけ、控えめに知らせる
+    if (lostCombo >= 2) showComboBanner('COMBO BREAK', 'break');
     playSound('snd-incorrect');
   }
 
@@ -358,7 +406,18 @@ function updateHud() {
   document.getElementById('hud-score').textContent = score;
   document.getElementById('hud-combo').textContent = combo;
   document.getElementById('hud-multiplier').textContent = `×${comboMultiplier(combo)}`;
-  document.getElementById('hud-combo').closest('.hud-box').classList.toggle('combo-hot', combo >= 3);
+  // コンボ数に応じてHUDの色を段階的に変える（3・5・10コンボ）
+  const box = document.getElementById('hud-combo').closest('.hud-box');
+  const tier = comboTier(combo);
+  [1, 2, 3].forEach(t => box.classList.toggle(`combo-tier-${t}`, tier === t));
+}
+
+// コンボ数 → 演出の段階（1〜2:0, 3〜4:1, 5〜9:2, 10以上:3）
+function comboTier(count) {
+  if (count >= 10) return 3;
+  if (count >= 5) return 2;
+  if (count >= 3) return 1;
+  return 0;
 }
 
 function renderPips() {
@@ -374,18 +433,29 @@ function renderPips() {
 }
 
 function bump(id) {
-  const el = document.getElementById(id);
-  el.classList.remove('bump');
-  void el.offsetWidth; // アニメーションを最初から再生するため
-  el.classList.add('bump');
+  replayAnimation(document.getElementById(id), 'bump');
 }
 
-function showScorePop(text) {
+function showScorePop(text, tier) {
   const pop = document.getElementById('score-pop');
   pop.textContent = text;
-  pop.classList.remove('show');
-  void pop.offsetWidth;
-  pop.classList.add('show');
+  pop.className = `score-pop tier-${tier}`;
+  replayAnimation(pop, 'show');
+}
+
+// 画面中央に短時間だけ出すコンボ表示（操作の邪魔にならないようクリックは素通りさせる）
+function showComboBanner(text, variant) {
+  const banner = document.getElementById('combo-banner');
+  banner.textContent = text;
+  banner.className = `combo-banner ${variant}`;
+  replayAnimation(banner, 'show');
+}
+
+// クラスを付け直して、CSSアニメーションを最初から再生する
+function replayAnimation(el, className) {
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
 }
 
 // =============================================
@@ -425,44 +495,149 @@ function showResult() {
   showScreen('screen-result');
 }
 
-// 獲得XP・レベルアップ・自己ベストの表示
+// ランク・自己ベスト・獲得XP・レベルアップの表示
 function renderOutcome(o) {
-  document.getElementById('result-xp-gained').textContent = `+${o.xpGained}`;
-  document.getElementById('result-level').textContent = `Lv.${o.after.level}`;
-  document.getElementById('result-next-xp').textContent =
-    `累計 ${record.totalXp} XP ／ 次のレベルまで あと ${o.after.xpToNextLevel} XP`;
-  setGauge('result-xp-fill', o.after);
+  const rankEl = document.getElementById('result-rank');
+  rankEl.textContent = o.rank;
+  rankEl.className = `rank-badge rank-${o.rank}`;
+  replayAnimation(rankEl, 'stamp');
 
-  const levelUp = document.getElementById('level-up');
-  const leveledUp = o.after.level > o.before.level;
-  levelUp.classList.toggle('hidden', !leveledUp);
-  if (leveledUp) {
-    document.getElementById('level-up-detail').textContent = `Lv.${o.before.level} → Lv.${o.after.level}`;
-    levelUp.classList.remove('play');
-    void levelUp.offsetWidth; // アニメーションを最初から再生するため
-    levelUp.classList.add('play');
-  }
+  const misses = questions.length - correctCount;
+  const cheer = document.getElementById('result-cheer');
+  cheer.textContent = misses === 0 ? 'PERFECT CLEAR!' : misses === 1 ? 'あと1問でパーフェクト！' : '';
+  cheer.classList.toggle('hidden', misses > 1);
 
   const best = document.getElementById('result-best');
   best.className = 'result-best';
-  if (o.isFirst) {
-    best.textContent = '🎉 この単元の初記録！';
-    best.classList.add('new');
-  } else if (o.isNewBest) {
-    best.textContent = `🏆 自己ベスト更新！（これまで ${o.prevBest}）`;
+  best.textContent = '';
+  if (o.isNewBest) {
+    const title = document.createElement('span');
+    title.className = 'new-record';
+    title.textContent = 'NEW RECORD';
+    const sub = document.createElement('span');
+    sub.className = 'new-record-sub';
+    sub.textContent = o.isFirst ? 'この単元の初記録！' : `自己ベスト更新（これまで ${o.prevBest}）`;
+    best.append(title, sub);
     best.classList.add('new');
   } else {
     best.textContent = `自己ベスト ${o.prevBest}`;
   }
 
+  document.getElementById('result-next-xp').textContent =
+    `累計 ${record.totalXp} XP ／ 次のレベルまで あと ${o.after.xpToNextLevel} XP`;
   document.getElementById('result-save-warning').classList.toggle('hidden', o.saved);
+  playXpAnimation(o);
+}
+
+// 獲得XPのカウントアップ → ゲージが伸びる → レベルアップ表示、の順に見せる
+function playXpAnimation(o) {
+  const gained = document.getElementById('result-xp-gained');
+  const levelEl = document.getElementById('result-level');
+  const levelUp = document.getElementById('level-up');
+  const leveledUp = o.after.level > o.before.level;
+
+  const showLevelUp = () => {
+    levelEl.textContent = `Lv.${o.after.level}`;
+    if (!leveledUp) return;
+    document.getElementById('level-up-detail').textContent = `Lv.${o.before.level} → Lv.${o.after.level}`;
+    levelUp.classList.remove('hidden');
+    replayAnimation(levelUp, 'play');
+    if (!prefersReducedMotion()) burstParticles();
+  };
+
+  levelUp.classList.add('hidden');
+  if (prefersReducedMotion()) {
+    gained.textContent = `+${o.xpGained}`;
+    setGauge('result-xp-fill', o.after);
+    showLevelUp();
+    return;
+  }
+
+  levelEl.textContent = `Lv.${o.before.level}`;
+  countUp(gained, o.xpGained, 700);
+
+  // ゲージはプレイ前の位置から始める
+  const fill = document.getElementById('result-xp-fill');
+  setGaugeInstant(fill, o.before);
+  if (!leveledUp) {
+    later(() => setGauge('result-xp-fill', o.after), 100);
+    return;
+  }
+  // レベルが上がるときは、いったん満タンにしてから新しいレベルのゲージを伸ばす
+  later(() => { fill.style.width = '100%'; }, 100);
+  later(() => {
+    setGaugeInstant(fill, { xpInLevel: 0, xpForNext: 1 });
+    showLevelUp();
+    later(() => setGauge('result-xp-fill', o.after), 100);
+  }, 1000);
+}
+
+function setGaugeInstant(fill, info) {
+  fill.style.transition = 'none';
+  fill.style.width = `${(info.xpInLevel / info.xpForNext) * 100}%`;
+  void fill.offsetWidth;
+  fill.style.transition = '';
+}
+
+// 獲得XPを0から数え上げる（タイマーで進めるので、最後は必ず目標の数字になる）
+function countUp(el, target, duration) {
+  const steps = 20;
+  el.textContent = '+0';
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    later(() => {
+      el.textContent = `+${Math.round(target * (1 - Math.pow(1 - t, 3)))}`;
+    }, duration * t);
+  }
+}
+
+// ピクセル風の紙吹雪（数十個の小さな四角を飛ばし、終わったら消す）
+function burstParticles() {
+  const box = document.getElementById('particles');
+  box.innerHTML = '';
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('span');
+    p.className = 'particle';
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 60 + Math.random() * 90;
+    p.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+    p.style.setProperty('--dy', `${Math.sin(angle) * distance - 30}px`);
+    p.style.setProperty('--delay', `${Math.random() * 120}ms`);
+    p.style.background = PARTICLE_COLORS[i % PARTICLE_COLORS.length];
+    box.appendChild(p);
+  }
+  later(() => { box.innerHTML = ''; }, 1500);
+}
+
+function later(fn, ms) {
+  effectTimers.push({ timeout: setTimeout(fn, ms) });
+}
+
+function clearEffects() {
+  effectTimers.forEach(t => clearTimeout(t.timeout));
+  effectTimers = [];
+  document.getElementById('particles').innerHTML = '';
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+// 間違えた数からランクを決める
+function rankFor(correct, total) {
+  const misses = total - correct;
+  if (misses === 0) return 'S';
+  if (misses === 1) return 'A';
+  if (misses <= 3) return 'B';
+  if (misses <= 5) return 'C';
+  return 'D';
 }
 
 // =============================================
 // 記録（レベル・XP・自己ベスト）
 // =============================================
 function defaultRecord() {
-  return { version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {} };
+  return { version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {}, bestRanks: {}, lastUnit: null };
 }
 
 // 保存データがない・壊れている・読めない場合は、初期状態で始める
@@ -497,6 +672,12 @@ function sanitizeRecord(data) {
       }
     });
   }
+  if (data.bestRanks && typeof data.bestRanks === 'object' && !Array.isArray(data.bestRanks)) {
+    Object.keys(data.bestRanks).forEach(key => {
+      if (RANKS.includes(data.bestRanks[key])) rec.bestRanks[key] = data.bestRanks[key];
+    });
+  }
+  if (typeof data.lastUnit === 'string') rec.lastUnit = data.lastUnit;
   return rec;
 }
 
@@ -534,8 +715,14 @@ function recordPlay() {
   const isNewBest = isFirst || score > prevBest;
   if (isNewBest) record.bestScores[key] = score;
 
+  // 単元ボタンに出すランクは、その単元でこれまでに取った一番よいランク
+  const rank = rankFor(correctCount, questions.length);
+  const prevRank = record.bestRanks[key];
+  if (!prevRank || RANKS.indexOf(rank) < RANKS.indexOf(prevRank)) record.bestRanks[key] = rank;
+  record.lastUnit = key;
+
   const saved = saveRecord();
-  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, saved };
+  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, saved };
 }
 
 // レベルLからL+1に上がるのに必要なXP
