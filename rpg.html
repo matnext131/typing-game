@@ -53,6 +53,11 @@
         <button id="btn-last-played" class="btn-last-played" type="button">もう一度</button>
       </div>
 
+      <button id="btn-review" class="review-entry" type="button">
+        <span class="review-entry-title">🛡 苦手克服クエスト</span>
+        <span id="review-entry-count" class="review-entry-count"></span>
+      </button>
+
       <div class="rules">
         <span>正解 <b>100点</b></span>
         <span>3連続 <b>×1.5</b></span>
@@ -65,6 +70,19 @@
 
       <a href="index.html" class="link-back">← 通常の4択クイズへ</a>
       <button id="btn-reset" class="btn-reset" type="button">記録をリセット</button>
+    </section>
+
+    <!-- 苦手克服クエストの分野選択画面 -->
+    <section id="screen-review" class="screen hidden">
+      <header class="title">
+        <p class="title-kicker">WEAK POINT QUEST</p>
+        <h1 class="title-main review-title">苦手克服クエスト</h1>
+        <p class="title-lead">間違えた用語を復習しよう。別々のプレイで2回正解すると克服！</p>
+      </header>
+
+      <div id="review-list" class="review-list"></div>
+
+      <button id="btn-review-home" class="btn btn-secondary" type="button">ホームへ戻る</button>
     </section>
 
     <!-- プレイ画面 -->
@@ -160,8 +178,14 @@
         <p id="result-save-warning" class="storage-warning hidden">記録を保存できませんでした（この画面を閉じると消えます）。</p>
       </div>
 
+      <div id="review-result" class="review-result hidden">
+        <h3 class="mistakes-title">克服の進み具合</h3>
+        <ul id="review-progress" class="review-progress"></ul>
+      </div>
+
       <div class="mistakes">
         <h3 id="mistakes-title" class="mistakes-title"></h3>
+        <p id="mistakes-note" class="mistakes-note hidden"></p>
         <ul id="mistakes-list" class="mistakes-list"></ul>
       </div>
 
@@ -173,7 +197,7 @@
     <div id="reset-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="reset-title">
       <div class="modal-card">
         <h2 id="reset-title" class="modal-title">記録をリセットしますか？</h2>
-        <p class="modal-text">この端末に保存されているレベル・累計XP・プレイ回数・正解数・自己ベストがすべて消えます。<b>元に戻すことはできません。</b></p>
+        <p class="modal-text">この端末に保存されているレベル・累計XP・プレイ回数・正解数・自己ベスト・苦手リストがすべて消えます。<b>元に戻すことはできません。</b></p>
         <button id="btn-reset-cancel" class="btn btn-secondary" type="button">やめる</button>
         <button id="btn-reset-confirm" class="btn btn-danger" type="button">すべて消去する</button>
       </div>

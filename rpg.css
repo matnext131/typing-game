@@ -256,6 +256,146 @@ body {
   background: var(--primary-hover);
 }
 
+/* 苦手克服クエストの入口（ホーム画面） */
+.review-entry {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 12px;
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 2px solid #ba68c8;
+  border-radius: 14px;
+  background: rgba(186, 104, 200, 0.14);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.review-entry:hover {
+  background: rgba(186, 104, 200, 0.24);
+}
+
+.review-entry-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.review-entry-count {
+  font-size: 0.9rem;
+  color: #e1bee7;
+}
+
+/* 苦手克服クエストの分野選択画面 */
+.review-title {
+  font-size: clamp(1.8rem, 7vw, 2.6rem);
+}
+
+.review-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.review-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.review-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.review-subject {
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.review-stats {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.review-best {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--pixel);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.review-empty {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+}
+
+.review-start {
+  margin-top: 10px;
+}
+
+/* 結果画面：克服の進み具合 */
+.review-result {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 2px solid #ba68c8;
+  border-radius: 14px;
+  background: rgba(186, 104, 200, 0.1);
+}
+
+.review-progress {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.review-item-term {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.review-item-status {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.review-item.mastered .review-item-status {
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.review-item.progress .review-item-status {
+  color: var(--xp);
+}
+
+.review-item.reset .review-item-status {
+  color: var(--text-muted);
+}
+
+.mistakes-note {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: #e1bee7;
+}
+
 /* 自己ベストのランク表示（単元ボタン・前回の単元） */
 .rank-chip {
   display: inline-block;

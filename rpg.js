@@ -29,10 +29,15 @@ const RANKS = ['S', 'A', 'B', 'C', 'D'];
 const PRAISES = ['GOOD', 'NICE', 'GREAT', 'PERFECT'];
 const PARTICLE_COLORS = ['#ffd54f', '#4fc3f7', '#66bb6a', '#ef5350', '#ba68c8', '#ffffff'];
 
+// 苦手克服クエスト：別々に最後まで解いた復習プレイで、この回数だけ正解すると克服
+const REVIEW_CLEAR_COUNT = 2;
+const REVIEW_NAME = '苦手克服クエスト';
+
 // =============================================
 // 状態管理
 // =============================================
 const units = buildUnits();
+const termIndex = buildTermIndex();
 let storageAvailable = true;
 let record = loadRecord();
 let playRecorded = false; // 今のプレイの記録を保存済みか（二重加算の防止）
@@ -67,9 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
   showScreen('screen-select');
 
   document.getElementById('btn-next').addEventListener('click', nextQuestion);
-  document.getElementById('btn-quit').addEventListener('click', backToSelect);
-  document.getElementById('btn-retry').addEventListener('click', () => startQuest(currentUnit));
-  document.getElementById('btn-back').addEventListener('click', backToSelect);
+  document.getElementById('btn-quit').addEventListener('click', backToMenu);
+  document.getElementById('btn-retry').addEventListener('click', () => {
+    // 苦手克服は、前回の結果を反映した最新の苦手リストから出題し直す
+    if (currentUnit.isReview) startReview(currentUnit.subject);
+    else startQuest(currentUnit);
+  });
+  document.getElementById('btn-back').addEventListener('click', backToMenu);
+  document.getElementById('btn-review').addEventListener('click', openReview);
+  document.getElementById('btn-review-home').addEventListener('click', backToSelect);
   document.getElementById('btn-last-played').addEventListener('click', () => {
     const unit = lastPlayedUnit();
     if (unit) startQuest(unit);
@@ -103,6 +114,23 @@ function buildUnits() {
 
 function subjectOf(topicObj) {
   return topicObj.topic.split('：')[0];
+}
+
+// 苦手リストで使う用語ID：「元の単元名::元の用語」
+// 表示名が同じでも単元が違えば別の用語カードとして扱う（ミックスで出た用語も元の単元のIDになる）
+function buildTermIndex() {
+  const byId = new Map();
+  const idOf = new Map();
+  topics.forEach(t => {
+    const subject = subjectOf(t);
+    if (!SUBJECTS.includes(subject)) return;
+    playableTerms(t.terms).forEach(term => {
+      const id = `${t.topic}::${term.term}`;
+      byId.set(id, { term, subject });
+      idOf.set(term, id);
+    });
+  });
+  return { byId, idOf };
 }
 
 // 出題できる用語だけを、表示名の重複を除いて返す
@@ -190,6 +218,7 @@ function renderHome() {
   setGauge('home-xp-fill', info);
   document.getElementById('storage-warning').classList.toggle('hidden', storageAvailable);
   renderLastPlayed();
+  renderReviewEntry();
   renderUnitList();
 }
 
@@ -233,6 +262,161 @@ function backToSelect() {
   showScreen('screen-select');
 }
 
+// プレイ画面・結果画面から戻る先（苦手克服なら分野選択、通常なら単元選択）
+function backToMenu() {
+  if (currentUnit && currentUnit.isReview) {
+    clearEffects();
+    openReview();
+  } else {
+    backToSelect();
+  }
+}
+
+// =============================================
+// 苦手克服クエスト
+// =============================================
+// 苦手リストのキー：「分野::表示名」。同じ分野で表示名が同じ用語は1件として扱い、分野が違えば別の件にする
+function weakKey(subject, label) {
+  return `${subject}::${label}`;
+}
+
+// 苦手1件から出題する用語カード。最初に苦手登録された問題（source）を使い、
+// 問題データが変わって見つからない場合だけ、同じ分野で同じ表示名の用語を使う
+function resolveWeak(key, entry) {
+  if (entry.source && termIndex.byId.has(entry.source)) return termIndex.byId.get(entry.source).term;
+  const label = key.slice(entry.subject.length + 2);
+  const mix = units.find(u => u.subject === entry.subject && u.isMix);
+  return (mix && mix.terms.find(t => termLabel(t) === label)) || null;
+}
+
+function weakEntries(subject) {
+  return Object.keys(record.weak)
+    .filter(key => key.startsWith(`${subject}::`) && record.weak[key].subject === subject)
+    .map(key => ({ key, term: resolveWeak(key, record.weak[key]), ...record.weak[key] }))
+    .filter(e => e.term);
+}
+
+// 克服していない苦手用語（同じ表示名が並ばないよう1つにまとめる）
+function weakPool(subject) {
+  return uniqueByLabel(weakEntries(subject).filter(e => !e.mastered).map(e => e.term));
+}
+
+function weakCounts(subject) {
+  const entries = weakEntries(subject);
+  const mastered = entries.filter(e => e.mastered).length;
+  return { weak: entries.length - mastered, mastered };
+}
+
+function renderReviewEntry() {
+  const weak = SUBJECTS.reduce((sum, s) => sum + weakCounts(s).weak, 0);
+  const mastered = SUBJECTS.reduce((sum, s) => sum + weakCounts(s).mastered, 0);
+  document.getElementById('review-entry-count').textContent = weak > 0
+    ? `苦手 ${weak}語 ／ 克服 ${mastered}語`
+    : mastered > 0 ? `苦手用語なし ／ 克服 ${mastered}語` : '間違えた用語がここに集まります';
+}
+
+function openReview() {
+  renderReview();
+  showScreen('screen-review');
+}
+
+function renderReview() {
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  SUBJECTS.forEach(subject => {
+    const counts = weakCounts(subject);
+    const pool = weakPool(subject);
+    const card = document.createElement('div');
+    card.className = 'review-card';
+
+    const head = document.createElement('div');
+    head.className = 'review-card-head';
+    const name = document.createElement('span');
+    name.className = 'review-subject';
+    name.textContent = subject;
+    const stats = document.createElement('span');
+    stats.className = 'review-stats';
+    stats.textContent = `苦手 ${counts.weak}語 ／ 克服 ${counts.mastered}語`;
+    head.append(name, stats);
+    card.appendChild(head);
+
+    const best = record.reviewBest[subject];
+    if (best !== undefined) {
+      const bestEl = document.createElement('span');
+      bestEl.className = 'review-best';
+      bestEl.textContent = `復習ベスト ${best}`;
+      card.appendChild(bestEl);
+    }
+
+    if (pool.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'review-empty';
+      empty.textContent = '現在、苦手用語はありません';
+      card.appendChild(empty);
+    } else {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary review-start';
+      btn.textContent = `復習する（全${Math.min(QUESTIONS_PER_PLAY, pool.length)}問）`;
+      btn.addEventListener('click', () => startReview(subject));
+      card.appendChild(btn);
+    }
+    list.appendChild(card);
+  });
+}
+
+function startReview(subject) {
+  const pool = weakPool(subject);
+  if (pool.length === 0) {
+    clearEffects();
+    openReview();
+    return;
+  }
+  const mix = units.find(u => u.subject === subject && u.isMix);
+  startQuest({
+    subject,
+    name: REVIEW_NAME,
+    terms: pool,
+    choicePool: mix.terms, // 誤答の候補は同じ分野の全用語から選ぶ（苦手が少なくても4択になる）
+    isReview: true
+  });
+}
+
+// 通常クエストで間違えた用語を苦手リストへ登録する（克服済みでも再登録し、正解回数は0に戻す）
+// 同じ分野の別単元で同じ表示名の用語を間違えても件数は増やさず、最初に登録した問題を出題し続ける
+function registerMistakes(terms) {
+  terms.forEach(term => {
+    const id = termIndex.idOf.get(term);
+    if (!id) return;
+    const subject = termIndex.byId.get(id).subject;
+    const key = weakKey(subject, termLabel(term));
+    const prev = record.weak[key];
+    const source = prev && termIndex.byId.has(prev.source) ? prev.source : id;
+    record.weak[key] = { subject, source, streak: 0, mastered: false };
+  });
+}
+
+// 復習プレイの結果を苦手リストへ反映し、結果画面用の一覧を返す
+function applyReviewResults() {
+  return questions.map((q, i) => {
+    const key = weakKey(currentUnit.subject, termLabel(q.correct));
+    const entry = record.weak[key] ||
+      { subject: currentUnit.subject, source: termIndex.idOf.get(q.correct), streak: 0, mastered: false };
+    let status;
+    if (results[i]) {
+      entry.streak = Math.min(entry.streak + 1, REVIEW_CLEAR_COUNT);
+      entry.mastered = entry.streak >= REVIEW_CLEAR_COUNT;
+      status = entry.mastered ? 'mastered' : 'progress';
+    } else {
+      entry.streak = 0;
+      entry.mastered = false;
+      status = 'reset';
+    }
+    record.weak[key] = entry;
+    return { term: q.correct, status, streak: entry.streak };
+  });
+}
+
 // =============================================
 // クエスト開始
 // =============================================
@@ -245,7 +429,7 @@ function startQuest(unit) {
   shuffle(pool);
   questions = pool.slice(0, questionCount(unit)).map(t => ({
     correct: t,
-    choices: buildChoices(t, unit.terms)
+    choices: buildChoices(t, unit.choicePool || unit.terms)
   }));
 
   currentIndex = 0;
@@ -469,11 +653,15 @@ function showResult() {
   document.getElementById('result-score').textContent = score;
   document.getElementById('result-correct').textContent = `${correctCount}/${questions.length}`;
   document.getElementById('result-max-combo').textContent = maxCombo;
+  document.getElementById('btn-back').textContent = currentUnit.isReview ? '苦手克服メニューへ戻る' : '単元選択へ戻る';
   if (outcome) renderOutcome(outcome);
 
   const title = document.getElementById('mistakes-title');
   const list = document.getElementById('mistakes-list');
   list.innerHTML = '';
+  const note = document.getElementById('mistakes-note');
+  note.textContent = currentUnit.isReview ? '' : '苦手克服クエストに登録しました';
+  note.classList.toggle('hidden', currentUnit.isReview || mistakes.length === 0);
 
   if (mistakes.length === 0) {
     title.textContent = '全問正解！パーフェクト！';
@@ -516,7 +704,8 @@ function renderOutcome(o) {
     title.textContent = 'NEW RECORD';
     const sub = document.createElement('span');
     sub.className = 'new-record-sub';
-    sub.textContent = o.isFirst ? 'この単元の初記録！' : `自己ベスト更新（これまで ${o.prevBest}）`;
+    const firstText = currentUnit.isReview ? 'この分野の苦手克服で初記録！' : 'この単元の初記録！';
+    sub.textContent = o.isFirst ? firstText : `自己ベスト更新（これまで ${o.prevBest}）`;
     best.append(title, sub);
     best.classList.add('new');
   } else {
@@ -526,7 +715,31 @@ function renderOutcome(o) {
   document.getElementById('result-next-xp').textContent =
     `累計 ${record.totalXp} XP ／ 次のレベルまで あと ${o.after.xpToNextLevel} XP`;
   document.getElementById('result-save-warning').classList.toggle('hidden', o.saved);
+  renderReviewProgress(o.review);
   playXpAnimation(o);
+}
+
+// 苦手克服クエストの結果：用語ごとに「克服」「あと1回」「やり直し」を表示
+function renderReviewProgress(review) {
+  const box = document.getElementById('review-result');
+  box.classList.toggle('hidden', !review);
+  if (!review) return;
+  const list = document.getElementById('review-progress');
+  list.innerHTML = '';
+  review.forEach(r => {
+    const li = document.createElement('li');
+    li.className = `review-item ${r.status}`;
+    const term = document.createElement('span');
+    term.className = 'review-item-term';
+    term.textContent = termLabel(r.term);
+    const status = document.createElement('span');
+    status.className = 'review-item-status';
+    status.textContent = r.status === 'mastered' ? '✨ 克服達成！'
+      : r.status === 'progress' ? `あと${REVIEW_CLEAR_COUNT - r.streak}回正解で克服`
+      : 'もう一度練習しよう';
+    li.append(term, status);
+    list.appendChild(li);
+  });
 }
 
 // 獲得XPのカウントアップ → ゲージが伸びる → レベルアップ表示、の順に見せる
@@ -624,20 +837,26 @@ function prefersReducedMotion() {
 }
 
 // 間違えた数からランクを決める
+// 苦手克服のように問題数が少ないときも妥当になるよう、正答率の目安と比べて低い方のランクにする
+// （10問・8問の単元はこれまでと同じ結果になる）
 function rankFor(correct, total) {
   const misses = total - correct;
-  if (misses === 0) return 'S';
-  if (misses === 1) return 'A';
-  if (misses <= 3) return 'B';
-  if (misses <= 5) return 'C';
-  return 'D';
+  const byMisses = misses === 0 ? 'S' : misses === 1 ? 'A' : misses <= 3 ? 'B' : misses <= 5 ? 'C' : 'D';
+  const ratio = total > 0 ? correct / total : 0;
+  const byRatio = ratio === 1 ? 'S' : ratio >= 0.85 ? 'A' : ratio >= 0.6 ? 'B' : ratio >= 0.375 ? 'C' : 'D';
+  return RANKS[Math.max(RANKS.indexOf(byMisses), RANKS.indexOf(byRatio))];
 }
 
 // =============================================
 // 記録（レベル・XP・自己ベスト）
 // =============================================
 function defaultRecord() {
-  return { version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {}, bestRanks: {}, lastUnit: null };
+  return {
+    version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {}, bestRanks: {}, lastUnit: null,
+    // 苦手克服：weak は { "分野::表示名": { subject, source（最初に登録した問題のID「単元名::用語」）,
+    //   streak（復習の連続正解回数）, mastered（克服済み） } }
+    weak: {}, reviewBest: {}
+  };
 }
 
 // 保存データがない・壊れている・読めない場合は、初期状態で始める
@@ -678,7 +897,72 @@ function sanitizeRecord(data) {
     });
   }
   if (typeof data.lastUnit === 'string') rec.lastUnit = data.lastUnit;
+  if (isPlainObject(data.weak)) rec.weak = migrateWeak(data.weak);
+  if (isPlainObject(data.reviewBest)) {
+    SUBJECTS.forEach(s => {
+      const v = data.reviewBest[s];
+      if (typeof v === 'number' && Number.isFinite(v) && v >= 0) rec.reviewBest[s] = Math.min(Math.floor(v), MAX_COUNT);
+    });
+  }
   return rec;
+}
+
+function isPlainObject(value) {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+// 苦手リストを「分野::表示名」のキーに揃える。
+// 以前の方式（キーが「単元名::用語」）で保存されたデータもここで変換する。
+// 同じキーにまとまる件が複数あるときの統合ルール：
+// - 出題する問題（source）は、先に登録された件（保存データで前にある件）のものを使う
+// - 克服済みになるのは、まとめた件がすべて克服済みのときだけ
+// - 克服前の連続正解回数は、克服していない件のうち少ない方に合わせる（早すぎる克服を防ぐ）
+function migrateWeak(raw) {
+  const result = {};
+  Object.keys(raw).forEach(oldKey => {
+    const e = raw[oldKey];
+    if (!isPlainObject(e)) return;
+
+    let key;
+    let subject;
+    let source = typeof e.source === 'string' ? e.source : null;
+    const head = oldKey.split('::')[0];
+    if (SUBJECTS.includes(head)) {
+      // 新しい方式
+      key = oldKey;
+      subject = head;
+    } else if (termIndex.byId.has(oldKey)) {
+      // 以前の方式：単元ごとの用語ID
+      const info = termIndex.byId.get(oldKey);
+      subject = info.subject;
+      key = weakKey(subject, termLabel(info.term));
+      source = oldKey;
+    } else {
+      // 今の問題データにない用語：消さずに残しておく（画面には出さない）
+      if (SUBJECTS.includes(e.subject)) result[oldKey] = cleanWeakEntry(e, e.subject, source);
+      return;
+    }
+
+    const entry = cleanWeakEntry(e, subject, source);
+    result[key] = result[key] ? mergeWeakEntries(result[key], entry) : entry;
+  });
+  return result;
+}
+
+function cleanWeakEntry(e, subject, source) {
+  // 克服前の連続正解回数は「克服に必要な回数 − 1」までに収める
+  const mastered = e.mastered === true;
+  const streak = Math.min(toCount(e.streak), mastered ? REVIEW_CLEAR_COUNT : REVIEW_CLEAR_COUNT - 1);
+  return { subject, source, streak, mastered };
+}
+
+function mergeWeakEntries(first, second) {
+  const source = first.source && termIndex.byId.has(first.source) ? first.source : (second.source || first.source);
+  const mastered = first.mastered && second.mastered;
+  const streak = mastered
+    ? REVIEW_CLEAR_COUNT
+    : Math.min(first.mastered ? Infinity : first.streak, second.mastered ? Infinity : second.streak);
+  return { subject: first.subject, source, streak, mastered };
 }
 
 function toCount(value) {
@@ -703,8 +987,11 @@ function recordPlay() {
   if (playRecorded) return null;
   playRecorded = true;
 
-  const key = unitKey(currentUnit);
-  const prevBest = record.bestScores[key];
+  // 苦手克服の自己ベストは分野ごとに、通常の単元別自己ベストとは別に記録する
+  const isReview = !!currentUnit.isReview;
+  const bestTable = isReview ? record.reviewBest : record.bestScores;
+  const key = isReview ? currentUnit.subject : unitKey(currentUnit);
+  const prevBest = bestTable[key];
   const before = levelInfo(record.totalXp);
   const xpGained = correctCount * XP_PER_CORRECT;
 
@@ -713,16 +1000,22 @@ function recordPlay() {
   record.totalCorrect = Math.min(record.totalCorrect + correctCount, MAX_COUNT);
   const isFirst = prevBest === undefined;
   const isNewBest = isFirst || score > prevBest;
-  if (isNewBest) record.bestScores[key] = score;
+  if (isNewBest) bestTable[key] = score;
 
-  // 単元ボタンに出すランクは、その単元でこれまでに取った一番よいランク
   const rank = rankFor(correctCount, questions.length);
-  const prevRank = record.bestRanks[key];
-  if (!prevRank || RANKS.indexOf(rank) < RANKS.indexOf(prevRank)) record.bestRanks[key] = rank;
-  record.lastUnit = key;
+  let review = null;
+  if (isReview) {
+    review = applyReviewResults();
+  } else {
+    // 単元ボタンに出すランクは、その単元でこれまでに取った一番よいランク
+    const prevRank = record.bestRanks[key];
+    if (!prevRank || RANKS.indexOf(rank) < RANKS.indexOf(prevRank)) record.bestRanks[key] = rank;
+    record.lastUnit = key;
+    registerMistakes(mistakes);
+  }
 
   const saved = saveRecord();
-  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, saved };
+  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, review, saved };
 }
 
 // レベルLからL+1に上がるのに必要なXP
