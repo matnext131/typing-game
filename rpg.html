@@ -44,6 +44,14 @@
       </div>
       <p id="storage-warning" class="storage-warning hidden">この端末では記録を保存できないため、ページを閉じると記録が消えます。</p>
 
+      <section class="companion-panel" aria-labelledby="companion-title">
+        <div class="companion-head">
+          <h2 id="companion-title" class="companion-title">お供</h2>
+          <span id="companion-ability" class="companion-ability"></span>
+        </div>
+        <div id="companion-list" class="companion-list"></div>
+      </section>
+
       <div id="last-played" class="last-played hidden">
         <div class="last-played-info">
           <span class="hud-label">前回の単元</span>
@@ -106,7 +114,27 @@
             <span id="hud-multiplier" class="hud-value">×1</span>
           </div>
         </div>
+        <div id="companion-hud" class="companion-hud hidden">
+          <span id="companion-hud-face" class="portrait companion-face"></span>
+          <span class="hud-label">お供</span>
+          <span id="companion-hud-name" class="companion-hud-name"></span>
+          <span id="companion-hud-status" class="companion-hud-status"></span>
+        </div>
         <ol id="hud-pips" class="pips" aria-label="進み具合"></ol>
+      </div>
+
+      <!-- ボス戦のときだけ表示 -->
+      <div id="boss-stage" class="boss-stage hidden">
+        <div id="boss-portrait" class="portrait boss-portrait"></div>
+        <div class="boss-info">
+          <span class="hud-label">BOSS</span>
+          <span id="boss-name" class="boss-name"></span>
+          <div class="boss-hp" role="progressbar" aria-label="ボスの残り体力" aria-valuemin="0">
+            <div id="boss-hp-fill" class="boss-hp-fill"></div>
+          </div>
+          <span id="boss-hint" class="boss-hint"></span>
+          <span id="boss-note" class="boss-note hidden"></span>
+        </div>
       </div>
 
       <div class="question-card">
@@ -131,9 +159,17 @@
     <!-- 結果画面 -->
     <section id="screen-result" class="screen hidden">
       <header class="result-head">
-        <p class="title-kicker">QUEST CLEAR</p>
+        <p id="result-kicker" class="title-kicker">QUEST CLEAR</p>
         <h2 id="result-unit" class="result-unit"></h2>
       </header>
+
+      <div id="boss-result" class="boss-result hidden" aria-live="polite">
+        <div id="boss-result-portrait" class="portrait boss-portrait"></div>
+        <div class="boss-result-text">
+          <p id="boss-result-title" class="boss-result-title"></p>
+          <p id="boss-result-detail" class="boss-result-detail"></p>
+        </div>
+      </div>
 
       <div class="result-score">
         <div class="result-score-top">
@@ -197,7 +233,7 @@
     <div id="reset-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="reset-title">
       <div class="modal-card">
         <h2 id="reset-title" class="modal-title">記録をリセットしますか？</h2>
-        <p class="modal-text">この端末に保存されているレベル・累計XP・プレイ回数・正解数・自己ベスト・苦手リストがすべて消えます。<b>元に戻すことはできません。</b></p>
+        <p class="modal-text">この端末に保存されているレベル・累計XP・プレイ回数・正解数・自己ベスト・苦手リスト・ボスの撃破記録・お供がすべて消えます。<b>元に戻すことはできません。</b></p>
         <button id="btn-reset-cancel" class="btn btn-secondary" type="button">やめる</button>
         <button id="btn-reset-confirm" class="btn btn-danger" type="button">すべて消去する</button>
       </div>
@@ -206,6 +242,7 @@
   </main>
 
   <script src="data.js"></script>
+  <script src="characters.js"></script>
   <script src="rpg.js"></script>
 </body>
 </html>

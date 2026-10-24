@@ -33,11 +33,24 @@ const PARTICLE_COLORS = ['#ffd54f', '#4fc3f7', '#66bb6a', '#ef5350', '#ba68c8', 
 const REVIEW_CLEAR_COUNT = 2;
 const REVIEW_NAME = '苦手克服クエスト';
 
+// ボス戦（characters.js の歴史人物）：10問中この数以上正解で撃破。初めて撃破した人物はお供として選べるようになる
+const BOSS_QUESTIONS = 10;
+const BOSS_CLEAR_COUNT = 8;
+// お供の能力（ボス戦では使えない）
+const ABILITIES = {
+  comboGuard: {
+    name: 'コンボ守り',
+    text: '1プレイに1回、2コンボ以上で不正解になってもコンボを維持する',
+    minCombo: 2
+  }
+};
+
 // =============================================
 // 状態管理
 // =============================================
 const units = buildUnits();
 const termIndex = buildTermIndex();
+const bosses = buildBosses();
 let storageAvailable = true;
 let record = loadRecord();
 let playRecorded = false; // 今のプレイの記録を保存済みか（二重加算の防止）
@@ -53,6 +66,8 @@ let mistakes = [];
 let results = [];      // 各問の正誤（true / false）
 let answered = false;
 let effectTimers = []; // 演出用のタイマー（画面を移るときにまとめて止める）
+let companion = null;  // 今のプレイで能力を使うお供（ボス戦では null）
+let guardUsed = false; // 今のプレイで「コンボ守り」を使ったか
 
 // =============================================
 // 画面切り替え
@@ -133,6 +148,13 @@ function buildTermIndex() {
   return { byId, idOf };
 }
 
+// ボス戦：人物ごとに、対象単元の用語から出題する（10問出せない単元の人物は出さない）
+function buildBosses() {
+  return characters
+    .map(character => ({ character, unit: units.find(u => !u.isMix && unitKey(u) === character.unit) }))
+    .filter(b => b.unit && b.unit.terms.length >= BOSS_QUESTIONS);
+}
+
 // 出題できる用語だけを、表示名の重複を除いて返す
 // （Excelの見出し行が用語として混ざっている単元があるため、説明のない行と「語句／意味」の行は除く）
 function playableTerms(terms) {
@@ -195,7 +217,39 @@ function renderUnitList() {
     btn.append(name, meta);
     btn.addEventListener('click', () => startQuest(unit));
     list.appendChild(btn);
+
+    const boss = bosses.find(b => b.unit === unit);
+    if (boss) list.appendChild(bossButton(boss));
   });
+}
+
+// 対象単元のすぐ下に出す「ボスに挑戦」ボタン
+function bossButton(boss) {
+  const { character } = boss;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'unit-btn unit-btn-boss';
+
+  const name = document.createElement('span');
+  name.textContent = `⚔ ボスに挑戦：${character.name}`;
+  const meta = document.createElement('span');
+  meta.className = 'unit-meta';
+  const condition = document.createElement('span');
+  condition.className = 'unit-count';
+  condition.textContent = record.bossDefeated[character.id] ? '撃破済み' : `${BOSS_CLEAR_COUNT}問正解で撃破`;
+  meta.appendChild(condition);
+
+  const best = record.bossBest[character.id];
+  if (best !== undefined) {
+    const bestEl = document.createElement('span');
+    bestEl.className = 'unit-best';
+    bestEl.textContent = `ベスト ${best}`;
+    meta.appendChild(bestEl);
+  }
+
+  btn.append(name, meta);
+  btn.addEventListener('click', () => startBoss(boss));
+  return btn;
 }
 
 function questionCount(unit) {
@@ -217,6 +271,7 @@ function renderHome() {
   document.getElementById('home-correct').textContent = record.totalCorrect;
   setGauge('home-xp-fill', info);
   document.getElementById('storage-warning').classList.toggle('hidden', storageAvailable);
+  renderCompanionPanel();
   renderLastPlayed();
   renderReviewEntry();
   renderUnitList();
@@ -245,6 +300,82 @@ function rankChip(rank) {
   chip.className = `rank-chip rank-${rank}`;
   chip.textContent = rank;
   return chip;
+}
+
+// =============================================
+// お供（同時に1体まで。ボスを初めて撃破すると選べるようになる）
+// =============================================
+function companionById(id) {
+  const character = characters.find(c => c.id === id);
+  return character && ABILITIES[character.ability] ? character : null;
+}
+
+function unlockedCompanions() {
+  return characters.filter(c => record.bossDefeated[c.id] && ABILITIES[c.ability]);
+}
+
+function selectedCompanion() {
+  return record.companion && record.bossDefeated[record.companion] ? companionById(record.companion) : null;
+}
+
+function renderCompanionPanel() {
+  const selected = selectedCompanion();
+  const ability = selected ? ABILITIES[selected.ability] : null;
+  document.getElementById('companion-ability').textContent = ability ? `${ability.name}：${ability.text}` : '';
+
+  const list = document.getElementById('companion-list');
+  list.innerHTML = '';
+  const owned = unlockedCompanions();
+  if (owned.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'companion-empty';
+    empty.textContent = 'ボスを初めて倒すと、その人物がお供になります';
+    list.appendChild(empty);
+    return;
+  }
+
+  // 「なし」と、解放済みのお供から1つ選ぶ
+  [null, ...owned].forEach(character => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'companion-option';
+    btn.setAttribute('aria-pressed', String(selected === character));
+    if (character) {
+      const face = document.createElement('span');
+      face.className = 'portrait companion-face';
+      btn.appendChild(fillPortrait(face, character, character.companionImage));
+    }
+    const label = document.createElement('span');
+    label.textContent = character ? character.name : 'なし';
+    btn.appendChild(label);
+    btn.addEventListener('click', () => selectCompanion(character ? character.id : null));
+    list.appendChild(btn);
+  });
+}
+
+function selectCompanion(id) {
+  record.companion = id;
+  saveRecord();
+  renderHome();
+}
+
+// 人物の画像を入れる。画像がまだない・読めないときは名前を文字で表示したままにする
+function fillPortrait(box, character, src) {
+  box.classList.remove('has-image');
+  const name = document.createElement('span');
+  name.className = 'portrait-name';
+  name.textContent = character.name;
+  const img = document.createElement('img');
+  img.className = 'portrait-img';
+  // お供の小さな顔はすぐ横に名前が出るので、読み上げが重ならないよう代替テキストを空にする
+  img.alt = box.classList.contains('companion-face') ? '' : character.name;
+  img.addEventListener('load', () => {
+    if (img.parentNode === box) box.classList.add('has-image');
+  });
+  img.addEventListener('error', () => img.remove());
+  img.src = src;
+  box.replaceChildren(name, img);
+  return box;
 }
 
 function setGauge(fillId, info) {
@@ -418,11 +549,75 @@ function applyReviewResults() {
 }
 
 // =============================================
+// ボス戦（対象単元の用語から10問。時間制限なし）
+// =============================================
+function startBoss(boss) {
+  startQuest({
+    subject: boss.unit.subject,
+    name: `ボス戦 ${boss.character.name}`,
+    terms: boss.unit.terms,
+    boss: boss.character
+  });
+}
+
+// プレイ画面のボス表示とお供表示（画像はプレイの最初に1回だけ入れる）
+function setupBattleCharacters() {
+  const boss = currentUnit.boss;
+  document.getElementById('boss-stage').classList.toggle('hidden', !boss);
+  if (boss) {
+    fillPortrait(document.getElementById('boss-portrait'), boss, boss.bossImage);
+    document.getElementById('boss-name').textContent = boss.name;
+    // お供を選んでいても、ボス戦では能力を使えないことを伝える
+    const selected = selectedCompanion();
+    const note = document.getElementById('boss-note');
+    note.textContent = selected ? `ボス戦ではお供（${selected.name}）の能力は使えません` : '';
+    note.classList.toggle('hidden', !selected);
+  }
+
+  document.getElementById('companion-hud').classList.toggle('hidden', !companion);
+  if (companion) {
+    fillPortrait(document.getElementById('companion-hud-face'), companion, companion.companionImage);
+    document.getElementById('companion-hud-name').textContent = companion.name;
+  }
+}
+
+// ボスの体力：撃破に必要な正解数から、これまでの正解数を引いた残り
+function updateBossHp() {
+  const remaining = Math.max(BOSS_CLEAR_COUNT - correctCount, 0);
+  const fill = document.getElementById('boss-hp-fill');
+  fill.style.width = `${(remaining / BOSS_CLEAR_COUNT) * 100}%`;
+  const gauge = fill.parentElement;
+  gauge.setAttribute('aria-valuemax', BOSS_CLEAR_COUNT);
+  gauge.setAttribute('aria-valuenow', remaining);
+
+  const left = questions.length - results.length;
+  document.getElementById('boss-hint').textContent = remaining === 0 ? '撃破条件クリア！最後まで解こう'
+    : remaining > left ? '今回は撃破できないけど、最後まで挑もう'
+    : `あと${remaining}問正解で撃破`;
+}
+
+function updateCompanionHud() {
+  const ability = ABILITIES[companion.ability];
+  const status = document.getElementById('companion-hud-status');
+  status.textContent = `${ability.name}：${guardUsed ? '使用済み' : '待機中'}`;
+  status.classList.toggle('used', guardUsed);
+}
+
+// お供の「コンボ守り」：1プレイに1回だけ、2コンボ以上つながっていたときに使う
+function canGuardCombo(lostCombo) {
+  return !!companion && companion.ability === 'comboGuard' && !guardUsed &&
+    lostCombo >= ABILITIES.comboGuard.minCombo;
+}
+
+// =============================================
 // クエスト開始
 // =============================================
 function startQuest(unit) {
   clearEffects();
   currentUnit = unit;
+  // お供の能力はボス戦では使わない（撃破条件を公平にするため）
+  companion = unit.boss ? null : selectedCompanion();
+  guardUsed = false;
 
   // 出題順はランダム、1プレイの中で同じ用語は出さない
   const pool = [...unit.terms];
@@ -442,6 +637,7 @@ function startQuest(unit) {
   playRecorded = false;
 
   document.getElementById('hud-unit').textContent = `${unit.subject}：${unit.name}`;
+  setupBattleCharacters();
   updateHud();
   showScreen('screen-battle');
   showQuestion();
@@ -527,10 +723,14 @@ function selectAnswer(btn, selected) {
     if (combo === 3) showComboBanner('3 COMBO', 'tier-1');
     if (combo === 5) showComboBanner('5 COMBO ×2', 'tier-2');
     if (combo === 10) showComboBanner('10 COMBO ×3', 'tier-3');
+    if (currentUnit.boss) replayAnimation(document.getElementById('boss-portrait'), 'damage');
     playSound('snd-correct');
   } else {
     const lostCombo = combo;
-    combo = 0;
+    // コンボ守りが発動したときはコンボだけを残す（不正解・苦手登録・ランクの扱いは通常どおり）
+    const guarded = canGuardCombo(lostCombo);
+    if (guarded) guardUsed = true;
+    else combo = 0;
     mistakes.push(q.correct);
 
     btn.classList.add('wrong', 'miss');
@@ -539,9 +739,11 @@ function selectAnswer(btn, selected) {
     });
     feedbackText.textContent = '❌ 不正解';
     feedbackText.className = 'feedback-text bad';
-    feedbackDetail.textContent = `正解：${correctLabel}` + (lostCombo >= 2 ? `（${lostCombo}コンボが途切れた…）` : '');
+    feedbackDetail.textContent = `正解：${correctLabel}` + (guarded ? `（${companion.name}が${lostCombo}コンボを守った！）`
+      : lostCombo >= 2 ? `（${lostCombo}コンボが途切れた…）` : '');
     // コンボがつながっていたときだけ、控えめに知らせる
-    if (lostCombo >= 2) showComboBanner('COMBO BREAK', 'break');
+    if (guarded) showComboBanner('COMBO GUARD', 'guard');
+    else if (lostCombo >= 2) showComboBanner('COMBO BREAK', 'break');
     playSound('snd-incorrect');
   }
 
@@ -594,6 +796,8 @@ function updateHud() {
   const box = document.getElementById('hud-combo').closest('.hud-box');
   const tier = comboTier(combo);
   [1, 2, 3].forEach(t => box.classList.toggle(`combo-tier-${t}`, tier === t));
+  if (currentUnit.boss) updateBossHp();
+  if (companion) updateCompanionHud();
 }
 
 // コンボ数 → 演出の段階（1〜2:0, 3〜4:1, 5〜9:2, 10以上:3）
@@ -649,6 +853,9 @@ function showResult() {
   // 最後まで解いたプレイだけを記録する（「やめる」で中断したプレイはここに来ない）
   const outcome = recordPlay();
 
+  const bossDefeated = !!(outcome && outcome.boss && outcome.boss.defeated);
+  document.getElementById('result-kicker').textContent = !currentUnit.boss ? 'QUEST CLEAR'
+    : bossDefeated ? 'BOSS DEFEATED' : 'BOSS BATTLE';
   document.getElementById('result-unit').textContent = `${currentUnit.subject}：${currentUnit.name}`;
   document.getElementById('result-score').textContent = score;
   document.getElementById('result-correct').textContent = `${correctCount}/${questions.length}`;
@@ -704,7 +911,8 @@ function renderOutcome(o) {
     title.textContent = 'NEW RECORD';
     const sub = document.createElement('span');
     sub.className = 'new-record-sub';
-    const firstText = currentUnit.isReview ? 'この分野の苦手克服で初記録！' : 'この単元の初記録！';
+    const firstText = currentUnit.isReview ? 'この分野の苦手克服で初記録！'
+      : currentUnit.boss ? 'このボス戦の初記録！' : 'この単元の初記録！';
     sub.textContent = o.isFirst ? firstText : `自己ベスト更新（これまで ${o.prevBest}）`;
     best.append(title, sub);
     best.classList.add('new');
@@ -716,7 +924,23 @@ function renderOutcome(o) {
     `累計 ${record.totalXp} XP ／ 次のレベルまで あと ${o.after.xpToNextLevel} XP`;
   document.getElementById('result-save-warning').classList.toggle('hidden', o.saved);
   renderReviewProgress(o.review);
+  renderBossResult(o.boss);
   playXpAnimation(o);
+}
+
+// ボス戦の結果：撃破できたか、初撃破でお供が解放されたか
+function renderBossResult(boss) {
+  const box = document.getElementById('boss-result');
+  box.classList.toggle('hidden', !boss);
+  if (!boss) return;
+  const { character } = boss;
+  box.classList.toggle('defeated', boss.defeated);
+  fillPortrait(document.getElementById('boss-result-portrait'), character, character.bossImage);
+  document.getElementById('boss-result-title').textContent = boss.defeated ? `${character.name}を撃破！` : '撃破ならず…';
+  document.getElementById('boss-result-detail').textContent = boss.firstDefeat
+    ? `${character.name}がお供になった！ホーム画面でお供に選べます`
+    : boss.defeated ? `${questions.length}問中${correctCount}問正解で勝利`
+    : `あと${BOSS_CLEAR_COUNT - correctCount}問正解で撃破。もう一度挑戦しよう`;
 }
 
 // 苦手克服クエストの結果：用語ごとに「克服」「あと1回」「やり直し」を表示
@@ -855,7 +1079,10 @@ function defaultRecord() {
     version: 1, totalXp: 0, totalPlays: 0, totalCorrect: 0, bestScores: {}, bestRanks: {}, lastUnit: null,
     // 苦手克服：weak は { "分野::表示名": { subject, source（最初に登録した問題のID「単元名::用語」）,
     //   streak（復習の連続正解回数）, mastered（克服済み） } }
-    weak: {}, reviewBest: {}
+    weak: {}, reviewBest: {},
+    // ボス戦：bossBest は { 人物ID: 自己ベスト }、bossDefeated は { 人物ID: true }（撃破済み＝お供として解放済み）
+    // companion は選んでいるお供の人物ID（なしは null）
+    bossBest: {}, bossDefeated: {}, companion: null
   };
 }
 
@@ -903,6 +1130,22 @@ function sanitizeRecord(data) {
       const v = data.reviewBest[s];
       if (typeof v === 'number' && Number.isFinite(v) && v >= 0) rec.reviewBest[s] = Math.min(Math.floor(v), MAX_COUNT);
     });
+  }
+  // ボス戦の記録（この項目がない以前の保存データでは、初期状態のまま）
+  if (isPlainObject(data.bossBest)) {
+    Object.keys(data.bossBest).forEach(id => {
+      const v = data.bossBest[id];
+      if (typeof v === 'number' && Number.isFinite(v) && v >= 0) rec.bossBest[id] = Math.min(Math.floor(v), MAX_COUNT);
+    });
+  }
+  if (isPlainObject(data.bossDefeated)) {
+    Object.keys(data.bossDefeated).forEach(id => {
+      if (data.bossDefeated[id] === true) rec.bossDefeated[id] = true;
+    });
+  }
+  // 選んでいたお供は、撃破済みで今も能力のある人物のときだけ使う
+  if (typeof data.companion === 'string' && rec.bossDefeated[data.companion] && companionById(data.companion)) {
+    rec.companion = data.companion;
   }
   return rec;
 }
@@ -987,10 +1230,11 @@ function recordPlay() {
   if (playRecorded) return null;
   playRecorded = true;
 
-  // 苦手克服の自己ベストは分野ごとに、通常の単元別自己ベストとは別に記録する
+  // 自己ベストは、苦手克服は分野ごと、ボス戦は人物ごとに、通常の単元別自己ベストとは別に記録する
   const isReview = !!currentUnit.isReview;
-  const bestTable = isReview ? record.reviewBest : record.bestScores;
-  const key = isReview ? currentUnit.subject : unitKey(currentUnit);
+  const boss = currentUnit.boss || null;
+  const bestTable = isReview ? record.reviewBest : boss ? record.bossBest : record.bestScores;
+  const key = isReview ? currentUnit.subject : boss ? boss.id : unitKey(currentUnit);
   const prevBest = bestTable[key];
   const before = levelInfo(record.totalXp);
   const xpGained = correctCount * XP_PER_CORRECT;
@@ -1004,8 +1248,16 @@ function recordPlay() {
 
   const rank = rankFor(correctCount, questions.length);
   let review = null;
+  let bossOutcome = null;
   if (isReview) {
     review = applyReviewResults();
+  } else if (boss) {
+    // ボス戦は「前回の単元」と単元ボタンのランクを変えない。間違えた用語は通常どおり苦手リストへ登録する
+    const defeated = correctCount >= BOSS_CLEAR_COUNT;
+    const firstDefeat = defeated && !record.bossDefeated[boss.id];
+    if (defeated) record.bossDefeated[boss.id] = true;
+    registerMistakes(mistakes);
+    bossOutcome = { character: boss, defeated, firstDefeat };
   } else {
     // 単元ボタンに出すランクは、その単元でこれまでに取った一番よいランク
     const prevRank = record.bestRanks[key];
@@ -1015,7 +1267,9 @@ function recordPlay() {
   }
 
   const saved = saveRecord();
-  return { xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, review, saved };
+  return {
+    xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, review, boss: bossOutcome, saved
+  };
 }
 
 // レベルLからL+1に上がるのに必要なXP
