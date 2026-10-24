@@ -11,6 +11,7 @@ const characters = [
     id: 'oda-nobunaga',
     name: '織田信長',
     unit: '歴史：ヨーロッパ人との出会いと全国統一',
+    unlock: { subject: '歴史', units: 10 },
     bossImage: 'assets/quest/characters/oda-nobunaga/boss.webp',
     companionImage: 'assets/quest/characters/oda-nobunaga/companion.webp',
     ability: 'comboGuard'

@@ -68,6 +68,7 @@ let answered = false;
 let effectTimers = []; // 演出用のタイマー（画面を移るときにまとめて止める）
 let companion = null;  // 今のプレイで能力を使うお供（ボス戦では null）
 let guardUsed = false; // 今のプレイで「コンボ守り」を使ったか
+let unlockNoticeTimer = null;
 
 // =============================================
 // 画面切り替え
@@ -82,9 +83,13 @@ function showScreen(id) {
 // 起動
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
+  // 以前の最高ランク・撃破済みデータからも解放する。既存項目は書き換えない。
+  const unlocks = updateBossUnlocks();
+  if (unlocks.changed) saveRecord();
   buildSubjectTabs();
   renderHome();
   showScreen('screen-select');
+  showBossUnlockNotice(unlocks.unlocked);
 
   document.getElementById('btn-next').addEventListener('click', nextQuestion);
   document.getElementById('btn-quit').addEventListener('click', backToMenu);
@@ -223,20 +228,74 @@ function renderUnitList() {
   });
 }
 
-// 対象単元のすぐ下に出す「ボスに挑戦」ボタン
+// 実在する通常単元の最高ランクだけを数える。ミックス・ボス戦・苦手克服は対象外。
+function bossUnlockProgress(character) {
+  const { subject, units: required } = character.unlock;
+  const eligibleKeys = new Set(units
+    .filter(unit => unit.subject === subject && !unit.isMix)
+    .map(unitKey));
+  const count = [...eligibleKeys].filter(key => ['S', 'A'].includes(record.bestRanks[key])).length;
+  return { subject, required, count: Math.min(count, required) };
+}
+
+function isBossUnlocked(character) {
+  return record.bossUnlocked[character.id] === true || record.bossDefeated[character.id] === true;
+}
+
+// 解放フラグは一度立てたら下げない。旧開発版の撃破済みデータも引き継ぐ。
+function updateBossUnlocks() {
+  const unlocked = [];
+  let changed = false;
+  bosses.forEach(({ character }) => {
+    if (record.bossUnlocked[character.id]) return;
+    const defeated = record.bossDefeated[character.id] === true;
+    const progress = bossUnlockProgress(character);
+    if (!defeated && progress.count < progress.required) return;
+    record.bossUnlocked[character.id] = true;
+    changed = true;
+    if (!defeated) unlocked.push(character);
+  });
+  return { changed, unlocked };
+}
+
+function showBossUnlockNotice(unlocked) {
+  if (!unlocked.length) return;
+  const notice = document.getElementById('boss-unlock-notice');
+  clearTimeout(unlockNoticeTimer);
+  document.getElementById('boss-unlock-message').textContent =
+    `${unlocked.map(character => character.name).join('・')}に挑戦できるようになりました！`;
+  notice.classList.remove('hidden');
+  replayAnimation(notice, 'show');
+  unlockNoticeTimer = setTimeout(() => notice.classList.add('hidden'), 2800);
+}
+
+// 対象単元のすぐ下に残す入口。進捗は無効ボタンの外でも読み上げ可能にする。
 function bossButton(boss) {
   const { character } = boss;
+  const unlocked = isBossUnlocked(character);
+  const entry = document.createElement('div');
+  entry.className = 'boss-entry';
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'unit-btn unit-btn-boss';
+  btn.disabled = !unlocked;
 
+  const heading = document.createElement('span');
+  heading.className = 'boss-entry-heading';
+  if (unlocked) {
+    const portrait = document.createElement('span');
+    portrait.className = 'portrait boss-entry-portrait';
+    heading.appendChild(fillPortrait(portrait, character, character.bossImage));
+  }
   const name = document.createElement('span');
-  name.textContent = `⚔ ボスに挑戦：${character.name}`;
+  name.textContent = unlocked ? `⚔ ボスに挑戦：${character.name}` : `🔒 ボス戦：${character.name}`;
+  heading.appendChild(name);
   const meta = document.createElement('span');
   meta.className = 'unit-meta';
   const condition = document.createElement('span');
   condition.className = 'unit-count';
-  condition.textContent = record.bossDefeated[character.id] ? '撃破済み' : `${BOSS_CLEAR_COUNT}問正解で撃破`;
+  condition.textContent = !unlocked ? '未解放'
+    : record.bossDefeated[character.id] ? '撃破済み' : `${BOSS_CLEAR_COUNT}問正解で撃破`;
   meta.appendChild(condition);
 
   const best = record.bossBest[character.id];
@@ -247,9 +306,25 @@ function bossButton(boss) {
     meta.appendChild(bestEl);
   }
 
-  btn.append(name, meta);
+  btn.append(heading, meta);
   btn.addEventListener('click', () => startBoss(boss));
-  return btn;
+  entry.appendChild(btn);
+  if (!unlocked) {
+    const { subject, count, required } = bossUnlockProgress(character);
+    const progress = document.createElement('div');
+    progress.className = 'boss-unlock-progress';
+    const label = document.createElement('span');
+    label.textContent = `${subject}Aランク以上 ${count}/${required}単元`;
+    const gauge = document.createElement('progress');
+    gauge.max = required;
+    gauge.value = count;
+    gauge.setAttribute('aria-label', `${character.name}の解放までの達成単元数`);
+    const remaining = document.createElement('span');
+    remaining.textContent = `あと${required - count}単元で解放`;
+    progress.append(label, gauge, remaining);
+    entry.appendChild(progress);
+  }
+  return entry;
 }
 
 function questionCount(unit) {
@@ -613,6 +688,8 @@ function canGuardCombo(lostCombo) {
 // クエスト開始
 // =============================================
 function startQuest(unit) {
+  // ボタン以外の経路（再挑戦など）でも未解放のボス戦は始めない。
+  if (unit.boss && !isBossUnlocked(unit.boss)) return;
   clearEffects();
   currentUnit = unit;
   // お供の能力はボス戦では使わない（撃破条件を公平にするため）
@@ -888,6 +965,7 @@ function showResult() {
   }
 
   showScreen('screen-result');
+  if (outcome) showBossUnlockNotice(outcome.unlockedBosses);
 }
 
 // ランク・自己ベスト・獲得XP・レベルアップの表示
@@ -1082,7 +1160,8 @@ function defaultRecord() {
     weak: {}, reviewBest: {},
     // ボス戦：bossBest は { 人物ID: 自己ベスト }、bossDefeated は { 人物ID: true }（撃破済み＝お供として解放済み）
     // companion は選んでいるお供の人物ID（なしは null）
-    bossBest: {}, bossDefeated: {}, companion: null
+    bossBest: {}, bossDefeated: {}, companion: null,
+    bossUnlocked: {} // 永続的な解放状態。既存の最高ランク・撃破記録と独立して保存する。
   };
 }
 
@@ -1141,6 +1220,11 @@ function sanitizeRecord(data) {
   if (isPlainObject(data.bossDefeated)) {
     Object.keys(data.bossDefeated).forEach(id => {
       if (data.bossDefeated[id] === true) rec.bossDefeated[id] = true;
+    });
+  }
+  if (isPlainObject(data.bossUnlocked)) {
+    Object.keys(data.bossUnlocked).forEach(id => {
+      if (data.bossUnlocked[id] === true) rec.bossUnlocked[id] = true;
     });
   }
   // 選んでいたお供は、撃破済みで今も能力のある人物のときだけ使う
@@ -1266,9 +1350,11 @@ function recordPlay() {
     registerMistakes(mistakes);
   }
 
+  const unlocks = updateBossUnlocks();
   const saved = saveRecord();
   return {
-    xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, review, boss: bossOutcome, saved
+    xpGained, before, after: levelInfo(record.totalXp), prevBest, isFirst, isNewBest, rank, review, boss: bossOutcome,
+    unlockedBosses: unlocks.unlocked, saved
   };
 }
 
